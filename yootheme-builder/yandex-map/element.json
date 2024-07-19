@@ -1,0 +1,254 @@
+{
+    "@import": "./element.php",
+    "name": "yandex_map",
+    "title": "Yandex Map",
+    "group": "multiple items",
+    "icon": "${url:images/icon.svg}",
+    "iconSmall": "${url:images/iconSmall.svg}",
+    "element": true,
+    "container": true,
+    "width": 500,
+    "defaults": {
+        "center_x": 0.0,
+        "center_y": 0.0,
+        "show_title": true,
+        "show_meta": true,
+        "show_content": true,
+        "show_image": true,
+        "show_link": true,
+        "type": "roadmap",
+        "zoom": 10,
+        "controls": true,
+        "zooming": false,
+        "dragging": false,
+        "min_zoom": 0,
+        "max_zoom": 18,
+        "text_color": "light",
+        "margin": "default"
+    },
+    "placeholder": {
+        "children": [{ "type": "list_item", "props": {} }]
+    },
+    "templates": {
+        "render": "./templates/template.php",
+        "content": "./templates/content.php"
+    },
+    "fields": {
+        "content": {
+            "label": "Items",
+            "type": "content-items",
+            "title": "title",
+            "button": "Add Item",
+            "item": "yandex-map_item"
+        },
+        "center_x": {
+            "label": "x",
+            "type": "number"
+        },
+        "center_y": {
+            "label": "y",
+            "type": "number"
+        },
+        "show_title": {
+            "label": "Display",
+            "type": "checkbox",
+            "text": "Show the title"
+        },
+        "show_meta": {
+            "type": "checkbox",
+            "text": "Show the meta text"
+        },
+        "show_content": {
+            "type": "checkbox",
+            "text": "Show the content"
+        },
+        "show_image": {
+            "type": "checkbox",
+            "text": "Show the image"
+        },
+        "show_link": {
+            "description": "Show or hide content fields without the need to delete the content itself.",
+            "type": "checkbox",
+            "text": "Show the link"
+        },
+        "type": {
+            "label": "Type",
+            "description": "Choose a map type.",
+            "type": "select",
+            "options": {
+                "Scheme": "scheme",
+                "Satellite": "satellite"
+            }
+        },
+        "zoom": {
+            "label": "Zoom",
+            "description": "Set the initial resolution at which to display the map. 0 is fully zoomed out and 18 is at the highest resolution zoomed in.",
+            "type": "range",
+            "attrs": {
+                "min": 0,
+                "max": 18,
+                "step": 1
+            }
+        },
+        "controls": {
+            "label": "Controls",
+            "description": "Display the map controls and define whether the map can be zoomed or dragged using the mouse wheel or touch.",
+            "type": "checkbox",
+            "text": "Show map controls"
+        },
+        "zooming": {
+            "type": "checkbox",
+            "text": "Enable map zooming"
+        },
+        "dragging": {
+            "type": "checkbox",
+            "text": "Enable map dragging"
+        },
+        "min_zoom": {
+            "label": "Minimum Zoom",
+            "description": "Minimum zoom level of the map.",
+            "type": "range",
+            "attrs": {
+                "min": 0,
+                "max": 18,
+                "step": 1
+            },
+            "enable": "zooming"
+        },
+        "max_zoom": {
+            "label": "Maximum Zoom",
+            "description": "Maximum zoom level of the map.",
+            "type": "range",
+            "attrs": {
+                "min": 0,
+                "max": 18,
+                "step": 1
+            },
+            "enable": "zooming"
+        },
+        "viewport_height": {
+            "type": "select",
+            "options": {
+                "None": "",
+                "Viewport": "viewport",
+                "Viewport (Subtract Next Section)": "section"
+            }
+        },
+        "viewport_height_viewport": {
+            "type": "number",
+            "attrs": {
+                "placeholder": "100",
+                "min": 0,
+                "max": 100,
+                "step": 10,
+                "class": "uk-form-width-xsmall"
+            },
+            "enable": "viewport_height == 'viewport'"
+        },
+        "viewport_height_offset_top": {
+            "type": "checkbox",
+            "text": "Subtract height above",
+            "enable": "viewport_height == 'viewport' && (viewport_height_viewport || 0) <= 100 || viewport_height == 'section'"
+        },
+        "height": {
+            "label": "Height",
+            "description": "Set the height in pixels.",
+            "type": "number",
+            "enable": "!viewport_height"
+        },
+        "width": {
+            "label": "Width",
+            "description": "Set the width in pixels. If no width is set, the map takes the full width. If both width and height are set, the map is responsive like an image. Additionally, the width can be used as a breakpoint. The map takes the full width, but below the breakpoint it will start to shrink preserving the aspect ratio.",
+            "type": "number",
+            "enable": "!viewport_height"
+        },
+        "width_breakpoint": {
+            "type": "checkbox",
+            "text": "Use as breakpoint only",
+            "enable": "width && !viewport_height"
+        },
+        "text_color": {
+            "label": "Text Color",
+            "description": "Set light or dark color mode for text, buttons and controls if a sticky transparent navbar is displayed above.",
+            "type": "select",
+            "options": {
+                "Light": "light",
+                "Dark": "dark"
+            },
+            "source": true
+        },
+        "name": "${builder.name}",
+        "status": "${builder.status}",
+        "source": "${builder.source}",
+        "id": "${builder.id}",
+        "class": "${builder.cls}",
+        "attributes": "${builder.attrs}",
+        "css": {
+            "label": "CSS",
+            "description": "Enter your own custom CSS. The following selectors will be prefixed automatically for this element: <code>.el-element</code>, <code>.el-item</code>, <code>.el-title</code>, <code>.el-meta</code>, <code>.el-content</code>, <code>.el-image</code>, <code>.el-link</code>",
+            "type": "editor",
+            "editor": "code",
+            "mode": "css",
+            "attrs": {
+                "debounce": 500,
+                "hints": [
+                    ".el-element",
+                    ".el-item",
+                    ".el-title",
+                    ".el-meta",
+                    ".el-content",
+                    ".el-image",
+                    ".el-link"
+                ]
+            }
+        },
+        "transform": "${builder.transform}"
+    },
+    "fieldset": {
+        "default": {
+            "type": "tabs",
+            "fields": [
+                {
+                    "title": "Content",
+                    "fields": [
+                        "content",
+                        "show_title",
+                        "show_meta",
+                        "show_content",
+                        "show_image",
+                        "show_link",
+                        {
+                            "label": "Center of map",
+                            "name": "_center_coords",
+                            "type": "grid",
+                            "width": "1-2",
+                            "fields": ["center_x", "center_y"]
+                        },
+                        "type",
+                        "controls",
+                        "zooming",
+                        "dragging",
+                        "zoom",
+                        "min_zoom",
+                        "max_zoom",
+                        {
+                            "label": "Viewport Height",
+                            "description": "The height can adapt to the height of the viewport. <br><br>Note: Make sure no height is set in the section settings when using one of the viewport options.",
+                            "name": "_viewport_height",
+                            "type": "grid",
+                            "width": "expand,auto",
+                            "gap": "small",
+                            "fields": ["viewport_height", "viewport_height_viewport"]
+                        },
+                        "viewport_height_offset_top",
+                        "height",
+                        "width",
+                        "width_breakpoint",
+                        "text_color"
+                    ]
+                },
+                "${builder.advanced}"
+            ]
+        }
+    }
+}

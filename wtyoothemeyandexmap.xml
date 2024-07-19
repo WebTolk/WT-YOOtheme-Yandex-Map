@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<extension type="plugin" method="upgrade" group="system">
+    <name>PLG_WTYOOTHEMEYANDEXMAP</name>
+    <author>Andrey Smirnikov</author>
+    <authorEmail>info@web-tolk.ru</authorEmail>
+    <authorUrl>https://web-tolk.ru/</authorUrl>
+    <creationDate>July 2024</creationDate>
+    <copyright>(C) 2024 Andrey Smirnikov</copyright>
+    <license>GNU General Public License version 3 or later</license>
+    <version>1.0.0</version>
+    <description>PLG_WTYOOTHEMEYANDEXMAP_DESC</description>
+    <scriptfile>script.php</scriptfile>
+    <namespace path="src">Joomla\Plugin\System\WtYoothemeYandexMap</namespace>
+    <files>
+        <folder plugin="wtyoothemeyandexmap">src</folder>
+        <folder>language</folder>
+        <folder>services</folder>
+        <folder>yootheme-builder</folder>
+    </files>
+    <languages folder="language" client="administrator">
+        <language tag="en-GB">en-GB/plg_system_wtyoothemeyandexmap.ini</language>
+        <language tag="en-GB">en-GB/plg_system_wtyoothemeyandexmap.sys.ini</language>
+        <language tag="ru-RU">ru-RU/plg_system_wtyoothemeyandexmap.ini</language>
+        <language tag="ru-RU">ru-RU/plg_system_wtyoothemeyandexmap.sys.ini</language>
+    </languages>
+    <config>
+        <fields name="params">
+            <fieldset name="basic">
+                <field addfieldprefix="Joomla\Plugin\System\WtYoothemeYandexMap\Fields"
+                       type="plugininfo" name="plugininfo"/>
+                <field name="yandex_map_api_key"
+                       type="text"
+                       label="PLG_WTYOOTHEMEYANDEXMAP_API_KEY_FIELD"
+                />
+            </fieldset>
+        </fields>
+    </config>
+</extension>
