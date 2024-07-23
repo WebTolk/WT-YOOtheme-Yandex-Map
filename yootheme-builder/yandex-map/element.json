@@ -16,14 +16,22 @@
         "show_content": true,
         "show_image": true,
         "show_link": true,
-        "type": "roadmap",
+        "type": "scheme",
         "zoom": 10,
         "controls": true,
         "zooming": false,
         "dragging": false,
         "min_zoom": 0,
-        "max_zoom": 18,
+        "max_zoom": 21,
         "text_color": "light",
+        "title_hover_style": "reset",
+        "title_element": "h3",
+        "meta_style": "text-meta",
+        "meta_align": "below-title",
+        "meta_element": "div",
+        "image_svg_color": "emphasis",
+        "link_text": "Read more",
+        "link_style": "default",
         "margin": "default"
     },
     "placeholder": {
@@ -40,14 +48,6 @@
             "title": "title",
             "button": "Add Item",
             "item": "yandex-map_item"
-        },
-        "center_x": {
-            "label": "x",
-            "type": "number"
-        },
-        "center_y": {
-            "label": "y",
-            "type": "number"
         },
         "show_title": {
             "label": "Display",
@@ -71,6 +71,101 @@
             "type": "checkbox",
             "text": "Show the link"
         },
+        "marker_icon": {
+            "label": "Marker Icon",
+            "type": "image"
+        },
+        "marker_icon_width": {
+            "label": "Width",
+            "type": "number",
+            "attrs": {
+                "placeholder": "auto"
+            },
+            "enable": "marker_icon"
+        },
+        "marker_icon_height": {
+            "label": "Height",
+            "type": "number",
+            "attrs": {
+                "placeholder": "auto"
+            },
+            "enable": "marker_icon"
+        },
+        "cluster_icon_1": {
+            "label": "Cluster Icon (< 10 Markers)",
+            "type": "image"
+        },
+        "cluster_icon_1_width": {
+            "label": "Width",
+            "type": "number",
+            "attrs": {
+                "placeholder": "auto"
+            },
+            "enable": "cluster_icon_1"
+        },
+        "cluster_icon_1_height": {
+            "label": "Height",
+            "type": "number",
+            "attrs": {
+                "placeholder": "auto"
+            },
+            "enable": "cluster_icon_1"
+        },
+        "cluster_icon_1_text_color": {
+            "label": "Text Color",
+            "type": "color",
+            "enable": "cluster_icon_1"
+        },
+        "cluster_icon_2": {
+            "label": "Cluster Icon (< 100 Markers)",
+            "type": "image"
+        },
+        "cluster_icon_2_width": {
+            "label": "Width",
+            "type": "number",
+            "attrs": {
+                "placeholder": "auto"
+            },
+            "enable": "cluster_icon_2"
+        },
+        "cluster_icon_2_height": {
+            "label": "Height",
+            "type": "number",
+            "attrs": {
+                "placeholder": "auto"
+            },
+            "enable": "cluster_icon_2"
+        },
+        "cluster_icon_2_text_color": {
+            "label": "Text Color",
+            "type": "color",
+            "enable": "cluster_icon_2"
+        },
+        "cluster_icon_3": {
+            "label": "Cluster Icon (100+ Markers)",
+            "type": "image"
+        },
+        "cluster_icon_3_width": {
+            "label": "Width",
+            "type": "number",
+            "attrs": {
+                "placeholder": "auto"
+            },
+            "enable": "cluster_icon_3"
+        },
+        "cluster_icon_3_height": {
+            "label": "Height",
+            "type": "number",
+            "attrs": {
+                "placeholder": "auto"
+            },
+            "enable": "cluster_icon_3"
+        },
+        "cluster_icon_3_text_color": {
+            "label": "Text Color",
+            "type": "color",
+            "enable": "cluster_icon_3"
+        },
         "type": {
             "label": "Type",
             "description": "Choose a map type.",
@@ -80,13 +175,21 @@
                 "Satellite": "satellite"
             }
         },
+        "center_x": {
+            "label": "Longitude",
+            "type": "number"
+        },
+        "center_y": {
+            "label": "Latitude",
+            "type": "number"
+        },
         "zoom": {
             "label": "Zoom",
             "description": "Set the initial resolution at which to display the map. 0 is fully zoomed out and 18 is at the highest resolution zoomed in.",
             "type": "range",
             "attrs": {
                 "min": 0,
-                "max": 18,
+                "max": 21,
                 "step": 1
             }
         },
@@ -110,7 +213,7 @@
             "type": "range",
             "attrs": {
                 "min": 0,
-                "max": 18,
+                "max": 21,
                 "step": 1
             },
             "enable": "zooming"
@@ -121,7 +224,7 @@
             "type": "range",
             "attrs": {
                 "min": 0,
-                "max": 18,
+                "max": 21,
                 "step": 1
             },
             "enable": "zooming"
@@ -177,6 +280,418 @@
             },
             "source": true
         },
+        "clustering": {
+            "label": "Clustering",
+            "type": "checkbox",
+            "text": "Enable marker clustering"
+        },
+        "popup_max_width": {
+            "label": "Max Width",
+            "description": "Set the maximum width.",
+            "type": "number"
+        },
+        "title_style": {
+            "label": "Style",
+            "description": "Title styles differ in font-size but may also come with a predefined color, size and font.",
+            "type": "select",
+            "options": {
+                "None": "",
+                "Heading Small": "heading-small",
+                "Heading H1": "h1",
+                "Heading H2": "h2",
+                "Heading H3": "h3",
+                "Heading H4": "h4",
+                "Heading H5": "h5",
+                "Heading H6": "h6",
+                "Text Meta": "text-meta",
+                "Text Lead": "text-lead",
+                "Text Small": "text-small",
+                "Text Large": "text-large"
+            },
+            "enable": "show_title"
+        },
+        "title_link": {
+            "label": "Link",
+            "description": "Link the title if a link exists.",
+            "type": "checkbox",
+            "text": "Link title",
+            "enable": "show_title && show_link"
+        },
+        "title_hover_style": {
+            "label": "Hover Style",
+            "description": "Set the hover style for a linked title.",
+            "type": "select",
+            "options": {
+                "None": "reset",
+                "Heading Link": "heading",
+                "Default Link": ""
+            },
+            "enable": "show_title && show_link && title_link"
+        },
+        "title_decoration": {
+            "label": "Decoration",
+            "description": "Decorate the title with a divider, bullet or a line that is vertically centered to the heading.",
+            "type": "select",
+            "options": {
+                "None": "",
+                "Divider": "divider",
+                "Bullet": "bullet",
+                "Line": "line"
+            },
+            "enable": "show_title"
+        },
+        "title_font_family": {
+            "label": "Font Family",
+            "description": "Select an alternative font family. Mind that not all styles have different font families.",
+            "type": "select",
+            "options": {
+                "None": "",
+                "Default": "default",
+                "Primary": "primary",
+                "Secondary": "secondary",
+                "Tertiary": "tertiary"
+            },
+            "enable": "show_title"
+        },
+        "title_color": {
+            "label": "Color",
+            "description": "Select the text color. If the Background option is selected, styles that don't apply a background image use the primary color instead.",
+            "type": "select",
+            "options": {
+                "None": "",
+                "Muted": "muted",
+                "Emphasis": "emphasis",
+                "Primary": "primary",
+                "Secondary": "secondary",
+                "Success": "success",
+                "Warning": "warning",
+                "Danger": "danger",
+                "Background": "background"
+            },
+            "enable": "show_title"
+        },
+        "title_element": {
+            "label": "HTML Element",
+            "description": "Set the level for the section heading or give it no semantic meaning.",
+            "type": "select",
+            "options": {
+                "h1": "h1",
+                "h2": "h2",
+                "h3": "h3",
+                "h4": "h4",
+                "h5": "h5",
+                "h6": "h6",
+                "div": "div"
+            },
+            "enable": "show_title"
+        },
+        "title_margin": {
+            "label": "Margin Top",
+            "description": "Set the top margin. Note that the margin will only apply if the content field immediately follows another content field.",
+            "type": "select",
+            "options": {
+                "Small": "small",
+                "Default": "",
+                "Medium": "medium",
+                "Large": "large",
+                "X-Large": "xlarge",
+                "None": "remove"
+            },
+            "enable": "show_title"
+        },
+        "meta_style": {
+            "label": "Style",
+            "description": "Select a predefined meta text style, including color, size and font-family.",
+            "type": "select",
+            "options": {
+                "None": "",
+                "Text Meta": "text-meta",
+                "Text Lead": "text-lead",
+                "Text Small": "text-small",
+                "Text Large": "text-large",
+                "Heading H1": "h1",
+                "Heading H2": "h2",
+                "Heading H3": "h3",
+                "Heading H4": "h4",
+                "Heading H5": "h5",
+                "Heading H6": "h6"
+            },
+            "enable": "show_meta"
+        },
+        "meta_color": {
+            "label": "Color",
+            "description": "Select the text color.",
+            "type": "select",
+            "options": {
+                "None": "",
+                "Muted": "muted",
+                "Emphasis": "emphasis",
+                "Primary": "primary",
+                "Secondary": "secondary",
+                "Success": "success",
+                "Warning": "warning",
+                "Danger": "danger"
+            },
+            "enable": "show_meta"
+        },
+        "meta_align": {
+            "label": "Alignment",
+            "description": "Align the meta text.",
+            "type": "select",
+            "options": {
+                "Above Title": "above-title",
+                "Below Title": "below-title",
+                "Below Content": "below-content"
+            },
+            "enable": "show_meta"
+        },
+        "meta_element": {
+            "label": "HTML Element",
+            "description": "Set the level for the section heading or give it no semantic meaning.",
+            "type": "select",
+            "options": {
+                "h1": "h1",
+                "h2": "h2",
+                "h3": "h3",
+                "h4": "h4",
+                "h5": "h5",
+                "h6": "h6",
+                "div": "div"
+            },
+            "enable": "show_meta"
+        },
+        "meta_margin": {
+            "label": "Margin Top",
+            "description": "Set the top margin. Note that the margin will only apply if the content field immediately follows another content field.",
+            "type": "select",
+            "options": {
+                "Small": "small",
+                "Default": "",
+                "Medium": "medium",
+                "Large": "large",
+                "X-Large": "xlarge",
+                "None": "remove"
+            },
+            "enable": "show_meta"
+        },
+        "content_style": {
+            "label": "Style",
+            "description": "Select a predefined text style, including color, size and font-family.",
+            "type": "select",
+            "options": {
+                "None": "",
+                "Text Meta": "text-meta",
+                "Text Lead": "text-lead",
+                "Text Small": "text-small",
+                "Text Large": "text-large",
+                "Heading H1": "h1",
+                "Heading H2": "h2",
+                "Heading H3": "h3",
+                "Heading H4": "h4",
+                "Heading H5": "h5",
+                "Heading H6": "h6"
+            },
+            "enable": "show_content"
+        },
+        "content_margin": {
+            "label": "Margin Top",
+            "description": "Set the top margin. Note that the margin will only apply if the content field immediately follows another content field.",
+            "type": "select",
+            "options": {
+                "Small": "small",
+                "Default": "",
+                "Medium": "medium",
+                "Large": "large",
+                "X-Large": "xlarge",
+                "None": "remove"
+            },
+            "enable": "show_content"
+        },
+        "image_width": {
+            "attrs": {
+                "placeholder": "auto"
+            },
+            "enable": "show_image"
+        },
+        "image_height": {
+            "attrs": {
+                "placeholder": "auto"
+            },
+            "enable": "show_image"
+        },
+        "image_loading": {
+            "label": "Loading",
+            "description": "By default, images are loaded lazy. Enable eager loading for images in the initial viewport.",
+            "type": "checkbox",
+            "text": "Load image eagerly",
+            "enable": "show_image"
+        },
+        "image_border": {
+            "label": "Border",
+            "description": "Select the image border style.",
+            "type": "select",
+            "options": {
+                "None": "",
+                "Rounded": "rounded",
+                "Circle": "circle",
+                "Pill": "pill"
+            },
+            "enable": "show_image"
+        },
+        "image_link": {
+            "label": "Link",
+            "description": "Link the image if a link exists.",
+            "type": "checkbox",
+            "text": "Link image",
+            "enable": "show_image && show_link"
+        },
+        "image_svg_inline": {
+            "label": "Inline SVG",
+            "description": "Inject SVG images into the page markup so that they can easily be styled with CSS.",
+            "type": "checkbox",
+            "text": "Make SVG stylable with CSS",
+            "enable": "show_image"
+        },
+        "image_svg_animate": {
+            "type": "checkbox",
+            "text": "Animate strokes",
+            "enable": "show_image && image_svg_inline"
+        },
+        "image_svg_color": {
+            "label": "SVG Color",
+            "description": "Select the SVG color. It will only apply to supported elements defined in the SVG.",
+            "type": "select",
+            "options": {
+                "None": "",
+                "Muted": "muted",
+                "Emphasis": "emphasis",
+                "Primary": "primary",
+                "Secondary": "secondary",
+                "Success": "success",
+                "Warning": "warning",
+                "Danger": "danger"
+            },
+            "enable": "show_image && image_svg_inline"
+        },
+        "link_target": {
+            "label": "Target",
+            "type": "checkbox",
+            "text": "Open in a new window",
+            "enable": "show_link"
+        },
+        "link_text": {
+            "label": "Text",
+            "description": "Enter the text for the link.",
+            "enable": "show_link"
+        },
+        "link_aria_label": {
+            "label": "ARIA Label",
+            "description": "Enter a descriptive text label to make it accessible if the link has no visible text.",
+            "enable": "show_link"
+        },
+        "link_style": {
+            "label": "Style",
+            "description": "Set the link style.",
+            "type": "select",
+            "options": {
+                "Button Default": "default",
+                "Button Primary": "primary",
+                "Button Secondary": "secondary",
+                "Button Danger": "danger",
+                "Button Text": "text",
+                "Link": "",
+                "Link Muted": "link-muted",
+                "Link Text": "link-text"
+            },
+            "enable": "show_link"
+        },
+        "link_size": {
+            "label": "Button Size",
+            "description": "Set the button size.",
+            "type": "select",
+            "options": {
+                "Small": "small",
+                "Default": "",
+                "Large": "large"
+            },
+            "enable": "show_link && link_style && !$match(link_style, 'link-(muted|text)')"
+        },
+        "link_fullwidth": {
+            "type": "checkbox",
+            "text": "Full width button",
+            "enable": "show_link && link_style && !$match(link_style, 'link-(muted|text)')"
+        },
+        "link_margin": {
+            "label": "Margin Top",
+            "description": "Set the top margin. Note that the margin will only apply if the content field immediately follows another content field.",
+            "type": "select",
+            "options": {
+                "Small": "small",
+                "Default": "",
+                "Medium": "medium",
+                "Large": "large",
+                "X-Large": "xlarge",
+                "None": "remove"
+            },
+            "enable": "show_link"
+        },
+        "position": "${builder.position}",
+        "position_left": "${builder.position_left}",
+        "position_right": "${builder.position_right}",
+        "position_top": "${builder.position_top}",
+        "position_bottom": "${builder.position_bottom}",
+        "position_z_index": "${builder.position_z_index}",
+        "blend": "${builder.blend}",
+        "margin": "${builder.margin}",
+        "margin_remove_top": "${builder.margin_remove_top}",
+        "margin_remove_bottom": "${builder.margin_remove_bottom}",
+        "maxwidth": "${builder.maxwidth}",
+        "maxwidth_breakpoint": "${builder.maxwidth_breakpoint}",
+        "block_align": "${builder.block_align}",
+        "block_align_breakpoint": "${builder.block_align_breakpoint}",
+        "block_align_fallback": "${builder.block_align_fallback}",
+        "item_text_align": {
+            "label": "Text Alignment",
+            "description": "Center, left and right alignment may depend on a breakpoint and require a fallback.",
+            "type": "select",
+            "options": {
+                "None": "",
+                "Left": "left",
+                "Center": "center",
+                "Right": "right",
+                "Justify": "justify"
+            }
+        },
+        "item_text_align_breakpoint": {
+            "label": "Text Alignment Breakpoint",
+            "description": "Define the device width from which the alignment will apply.",
+            "type": "select",
+            "options": {
+                "Always": "",
+                "Small (Phone Landscape)": "s",
+                "Medium (Tablet Landscape)": "m",
+                "Large (Desktop)": "l",
+                "X-Large (Large Screens)": "xl"
+            },
+            "enable": "item_text_align && item_text_align != 'justify'"
+        },
+        "item_text_align_fallback": {
+            "label": "Text Alignment Fallback",
+            "description": "Define an alignment fallback for device widths below the breakpoint.",
+            "type": "select",
+            "options": {
+                "None": "",
+                "Left": "left",
+                "Center": "center",
+                "Right": "right",
+                "Justify": "justify"
+            },
+            "enable": "item_text_align && item_text_align != 'justify' && item_text_align_breakpoint"
+        },
+        "animation": "${builder.animation}",
+        "_parallax_button": "${builder._parallax_button}",
+        "visibility": "${builder.visibility}",
+        "container_padding_remove": "${builder.container_padding_remove}",
         "name": "${builder.name}",
         "status": "${builder.status}",
         "source": "${builder.source}",
@@ -217,34 +732,193 @@
                         "show_content",
                         "show_image",
                         "show_link",
+                        "marker_icon",
                         {
-                            "label": "Center of map",
-                            "name": "_center_coords",
+                            "name": "_marker_icon_dimension",
                             "type": "grid",
                             "width": "1-2",
-                            "fields": ["center_x", "center_y"]
+                            "fields": ["marker_icon_width", "marker_icon_height"]
                         },
-                        "type",
-                        "controls",
-                        "zooming",
-                        "dragging",
-                        "zoom",
-                        "min_zoom",
-                        "max_zoom",
+                        "cluster_icon_1",
                         {
-                            "label": "Viewport Height",
-                            "description": "The height can adapt to the height of the viewport. <br><br>Note: Make sure no height is set in the section settings when using one of the viewport options.",
-                            "name": "_viewport_height",
+                            "name": "_cluster_icon_1_dimensions",
                             "type": "grid",
-                            "width": "expand,auto",
-                            "gap": "small",
-                            "fields": ["viewport_height", "viewport_height_viewport"]
+                            "width": "1-3",
+                            "fields": [
+                                "cluster_icon_1_width",
+                                "cluster_icon_1_height",
+                                "cluster_icon_1_text_color"
+                            ]
                         },
-                        "viewport_height_offset_top",
-                        "height",
-                        "width",
-                        "width_breakpoint",
-                        "text_color"
+                        "cluster_icon_2",
+                        {
+                            "name": "_cluster_icon_2_dimensions",
+                            "type": "grid",
+                            "width": "1-3",
+                            "fields": [
+                                "cluster_icon_2_width",
+                                "cluster_icon_2_height",
+                                "cluster_icon_2_text_color"
+                            ]
+                        },
+                        "cluster_icon_3",
+                        {
+                            "name": "_cluster_icon_3_dimensions",
+                            "type": "grid",
+                            "width": "1-3",
+                            "fields": [
+                                "cluster_icon_3_width",
+                                "cluster_icon_3_height",
+                                "cluster_icon_3_text_color"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "title": "Settings",
+                    "fields": [
+                        {
+                            "label": "Map",
+                            "type": "group",
+                            "divider": true,
+                            "fields": [
+                                "type",
+                                {
+                                    "label": "Center of map",
+                                    "name": "_center_coords",
+                                    "type": "grid",
+                                    "width": "1-2",
+                                    "fields": ["center_y", "center_x"]
+                                },
+                                "controls",
+                                "zooming",
+                                "dragging",
+                                "zoom",
+                                "min_zoom",
+                                "max_zoom",
+                                {
+                                    "label": "Viewport Height",
+                                    "description": "The height can adapt to the height of the viewport. <br><br>Note: Make sure no height is set in the section settings when using one of the viewport options.",
+                                    "name": "_viewport_height",
+                                    "type": "grid",
+                                    "width": "expand,auto",
+                                    "gap": "small",
+                                    "fields": ["viewport_height", "viewport_height_viewport"]
+                                },
+                                "viewport_height_offset_top",
+                                "height",
+                                "width",
+                                "width_breakpoint",
+                                "text_color"
+                            ]
+                        },
+                        {
+                            "label": "Marker",
+                            "type": "group",
+                            "divider": true,
+                            "fields": ["clustering"]
+                        },
+                        {
+                            "label": "Popup",
+                            "type": "group",
+                            "divider": true,
+                            "fields": ["popup_max_width"]
+                        },
+                        {
+                            "label": "Title",
+                            "type": "group",
+                            "divider": true,
+                            "fields": [
+                                "title_style",
+                                "title_link",
+                                "title_hover_style",
+                                "title_decoration",
+                                "title_font_family",
+                                "title_color",
+                                "title_element",
+                                "title_margin"
+                            ]
+                        },
+                        {
+                            "label": "Meta",
+                            "type": "group",
+                            "divider": true,
+                            "fields": [
+                                "meta_style",
+                                "meta_color",
+                                "meta_align",
+                                "meta_element",
+                                "meta_margin"
+                            ]
+                        },
+                        {
+                            "label": "Content",
+                            "type": "group",
+                            "divider": true,
+                            "fields": ["content_style", "content_margin"]
+                        },
+                        {
+                            "label": "Image",
+                            "type": "group",
+                            "divider": true,
+                            "fields": [
+                                {
+                                    "label": "Width/Height",
+                                    "description": "Setting just one value preserves the original proportions. The image will be resized and cropped automatically, and where possible, high resolution images will be auto-generated.",
+                                    "type": "grid",
+                                    "width": "1-2",
+                                    "fields": ["image_width", "image_height"]
+                                },
+                                "image_loading",
+                                "image_border",
+                                "image_link",
+                                "image_svg_inline",
+                                "image_svg_animate",
+                                "image_svg_color"
+                            ]
+                        },
+                        {
+                            "label": "Link",
+                            "type": "group",
+                            "divider": true,
+                            "fields": [
+                                "link_target",
+                                "link_text",
+                                "link_aria_label",
+                                "link_style",
+                                "link_size",
+                                "link_fullwidth",
+                                "link_margin"
+                            ]
+                        },
+                        {
+                            "label": "General",
+                            "type": "group",
+                            "fields": [
+                                "position",
+                                "position_left",
+                                "position_right",
+                                "position_top",
+                                "position_bottom",
+                                "position_z_index",
+                                "blend",
+                                "margin",
+                                "margin_remove_top",
+                                "margin_remove_bottom",
+                                "maxwidth",
+                                "maxwidth_breakpoint",
+                                "block_align",
+                                "block_align_breakpoint",
+                                "block_align_fallback",
+                                "item_text_align",
+                                "item_text_align_breakpoint",
+                                "item_text_align_fallback",
+                                "animation",
+                                "_parallax_button",
+                                "visibility",
+                                "container_padding_remove"
+                            ]
+                        }
                     ]
                 },
                 "${builder.advanced}"

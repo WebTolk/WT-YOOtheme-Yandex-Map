@@ -1,0 +1,19 @@
+ymaps.ymaps3x0--default-marker__popup
+{
+    flex-direction: column-reverse;
+    padding: 0;
+    gap: 4px;
+}
+
+ymaps.ymaps3x0--default-marker__popup-container
+{
+    max-width: 100%;
+    width: 100%;
+    padding: 0rem 1rem 0.5rem;
+    text-wrap: wrap;
+}
+
+button.ymaps3x0--default-marker__popup__close
+{
+    margin: 4px 4px 4px auto;
+}

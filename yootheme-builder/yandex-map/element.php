@@ -14,6 +14,7 @@ $api_key = json_decode($plugin->params)->yandex_map_api_key;
 
 // Подключаем API 3.0 Яндекс карт
 $wa->registerAndUseScript('plg.system.wtyoothemeyandexmap_api', "https://api-maps.yandex.ru/3.0/?apikey={$api_key}&lang=ru_RU");
+$wa->registerAndUseStyle('plg.system.wtyoothemeyandexmap_popup_style', 'plugins/system/wtyoothemeyandexmap/yootheme-builder/yandex-map/element.css');
 
 return [
     'transforms' => [
