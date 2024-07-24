@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
             await ymaps3.ready;
             const {YMapZoomControl} = await ymaps3.import('@yandex/ymaps3-controls@0.0.1');
             const {YMapDefaultMarker} = await ymaps3.import('@yandex/ymaps3-markers@0.0.1');
+            const {YMapClusterer, clusterByGrid} = await ymaps3.import('@yandex/ymaps3-clusterer@0.0.1');
 
             const isZoomEnable = yandexmapProps['zooming'];
             const cfg = {
@@ -35,6 +36,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 };
             }
 
+            // при использовании компонента uk-height-viewport с параметром offset-top: true,
+            // скрипт вычисляет значение min-height. Так как контейнер для яндекс карт должен иметь атрибут height,
+            // здесь мы просто присваиваем атрибуту height вычисленное значение min-height.
+            if (elem.__uikit__.heightViewport)
+            {
+                elem.style.height = elem.__uikit__.heightViewport._data.minHeight;
+            }
+            //
             const map = new ymaps3.YMap(elem, cfg);
             switch (yandexmapProps['type']) {
                 case 'satellite':
@@ -55,8 +64,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 );
             }
 
-
-            // TEST CODE //
             const k = 'ymaps3x0--default-marker__';
             class CustomMarker extends YMapDefaultMarker
             {
@@ -66,6 +73,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 constructor(props) {
                     super(props);
+                }
+
+                _createMarker() {
+                    const marker = super._createMarker();
+                    if (this._props.markerProps['show_popup'])
+                    {
+                        super._togglePopup(1);
+                    }
+                    return marker;
+                }
+
+                _image(icon, width, height)
+                {
+                    const elem = document.createElement('img');
+                    elem.src = icon;
+                    if (width)
+                    {
+                        elem.style.width = width + 'px';
+                    }
+                    if (height)
+                    {
+                        elem.style.height = height + 'px';
+                        elem.style.position = 'absolute';
+                        elem.style.top = 'calc(50% - ' + (height / 2) + 'px)';
+                    }
+
+                    return elem;
                 }
 
                 _createContainer()
@@ -78,21 +112,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     this._container = document.createElement("ymaps");
                     const t = e(this._container, "view")
                         , o = e(t, "icon");
-                    if (this._props.props['marker_icon'])
+                    if (this._props.markerProps['marker_icon'] || this._props.props['marker_icon'])
                     {
-                        const elem = document.createElement('img');
-                        elem.src = this._props.props['marker_icon'];
-                        if (this._props.props['marker_icon_width'])
-                        {
-                            elem.style.width = this._props.props['marker_icon_width'] + 'px';
-                        }
-                        if (this._props.props['marker_icon_height'])
-                        {
-                            elem.style.height = this._props.props['marker_icon_height'] + 'px';
-                            elem.style.position = 'absolute';
-                            elem.style.top = 'calc(50% - ' + (this._props.props['marker_icon_height'] / 2) + 'px)';
-                        }
-                        o.appendChild(elem);
+                        o.appendChild(this._image(
+                            this._props.markerProps['marker_icon'] ? this._props.markerProps['marker_icon'] : this._props.props['marker_icon'],
+                            this._props.markerProps['marker_icon_width'] ? this._props.markerProps['marker_icon_width'] : this._props.props['marker_icon_width'],
+                            this._props.markerProps['marker_icon_height'] ? this._props.markerProps['marker_icon_height'] : this._props.props['marker_icon_height']
+                        ));
                     }
                     else
                     {
@@ -114,29 +140,59 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (yandexmapProps['markers'])
             {
+                const isClustering = yandexmapProps['clustering'] === true;
+                const markerCoordinates = [];
                 for (const markerData of yandexmapProps['markers'])
                 {
-                    let content = '';
-                    content += popupImage(yandexmapProps, markerData);
-                    content += popupElem('title', yandexmapProps, markerData['title']);
-                    content += popupElem('meta', yandexmapProps, markerData['meta']);
-                    content += popupElem('content', yandexmapProps, markerData['content'], true);
-                    content += popupLink(yandexmapProps, markerData);
+                    let contentHTML = '';
+                    contentHTML += popupImage(yandexmapProps, markerData);
+                    contentHTML += popupElem('title', yandexmapProps, markerData['title']);
+                    contentHTML += popupElem('meta', yandexmapProps, markerData['meta']);
+                    contentHTML += popupElem('content', yandexmapProps, markerData['content'], true);
+                    contentHTML += popupLink(yandexmapProps, markerData);
 
                     const [lat, lng] = markerData['location'].split(',');
                     const markerCfg = {
                         coordinates: [parseFloat(lng), parseFloat(lat)],
-                        popup: {content: content, position: 'left'},
-                        props: markerData
-                    }
+                        popup: {content: contentHTML, position: 'left'},
+                        props: yandexmapProps,
+                        markerProps: markerData
+                    };
                     if (yandexmapProps['show_title'] && markerData['title'])
                     {
                         markerCfg.title = markerData['title'];
                     }
-                    map.addChild(new CustomMarker(markerCfg));
+
+                    if (isClustering)
+                    {
+                        markerCoordinates.push({coordinates: [lng, lat], element: new CustomMarker(markerCfg)});
+                    }
+                    else
+                    {
+                        map.addChild(new CustomMarker(markerCfg));
+                    }
+                }
+
+                if (isClustering)
+                {
+                    const featureList = markerCoordinates.map((value, i) => ({
+                        type: 'Feature',
+                        id: i,
+                        geometry: {coordinates: value.coordinates, element: value.element}
+                    }));
+
+                    const markerRender = (feature) => feature.geometry.element;
+                    const clusterRender = (coordinates, features) => new ymaps3.YMapMarker({coordinates}, circle(features.length).cloneNode(true));
+
+                    const clusterer = new YMapClusterer({
+                        method: clusterByGrid({gridSize: 64}),
+                        features: featureList,
+                        marker: markerRender,
+                        cluster: clusterRender
+                    });
+                    map.addChild(clusterer);
                 }
             }
-            // TEST CODE END //
         }
 
         w.component("Yandexmap", {
@@ -150,6 +206,15 @@ document.addEventListener('DOMContentLoaded', () => {
         })
     })(UIkit, UIkit.util);
 });
+
+function circle(count)
+{
+    const circle = document.createElement('div');
+    circle.classList.add('circle');
+    circle.style = "width: 48px; height: 48px; background-color: rgb(255, 51, 51); border-radius: 50%; transform: translate(-50%, -50%); display: flex; justify-content: center; align-items: center;";
+    circle.innerHTML = `<span style="color: white; font-size: 1.5rem" class="circle-text">${count}</span>`;
+    return circle;
+}
 
 function popupLink(props, marker)
 {

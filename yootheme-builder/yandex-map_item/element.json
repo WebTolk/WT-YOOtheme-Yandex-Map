@@ -81,7 +81,6 @@
             "type": "checkbox",
             "text": "Show popup on load"
         },
-        "item_element": "${builder.html_element_item}",
         "image_focal_point": {
             "label": "Focal Point",
             "description": "Set a focal point to adjust the image focus when cropping.",
@@ -142,7 +141,7 @@
                             "label": "Popup",
                             "type": "group",
                             "divider": true,
-                            "fields": ["show_popup", "item_element"]
+                            "fields": ["show_popup"]
                         },
                         {
                             "label": "Image",
