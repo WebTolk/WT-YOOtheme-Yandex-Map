@@ -75,6 +75,32 @@ document.addEventListener('DOMContentLoaded', () => {
                     super(props);
                 }
 
+                _createPopup() {
+                    const {position: e, content: t, hidesMarker: o} = this._popupProps;
+                    if (this._popup ? this._popup.innerHTML = "" : this._popup = document.createElement("ymaps"),
+                        this._popup.className = `${k}popup_${o ? "center" : e} ${k}hider`,
+                    "string" == typeof t) {
+                        this._popup.classList.add(`${k}popup`);
+                        const e = document.createElement("ymaps");
+                        e.className = `${k}popup-container`;
+                        e.innerHTML = t;
+                        // set popup max width
+                        if (this._props.props['popup_max_width'])
+                        {
+                            e.style.maxWidth = this._props.props['popup_max_width'] + 'px';
+                        }
+                        //
+                        this._popup.appendChild(e);
+                        const o = document.createElement("button");
+                        o.className = `${k}popup__close`;
+                        o.textContent = "✖";
+                        o.onclick = ()=>this._togglePopup(!1);
+                        this._popup.appendChild(o);
+                    } else
+                        this._popup.appendChild(t((()=>this._togglePopup(!1))));
+                    return this._popup
+                }
+
                 _createMarker() {
                     const marker = super._createMarker();
                     if (this._props.markerProps['show_popup'])
