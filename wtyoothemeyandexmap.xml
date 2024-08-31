@@ -35,4 +35,8 @@
             </fieldset>
         </fields>
     </config>
+    <updateservers>
+        <server type="extension" priority="1" name="WT YOOtheme Yandex Map updates">https://web-tolk.ru/component/swjprojects/jupdate?element=wtyoothemeyandexmap</server>
+    </updateservers>
+    <changelogurl>https://web-tolk.ru/jchangelog?element=wtyoothemeyandexmap</changelogurl>
 </extension>
