@@ -4,10 +4,10 @@
     <author>Andrey Smirnikov</author>
     <authorEmail>info@web-tolk.ru</authorEmail>
     <authorUrl>https://web-tolk.ru/</authorUrl>
-    <creationDate>July 2024</creationDate>
-    <copyright>(C) 2024 Andrey Smirnikov</copyright>
+    <creationDate>September 2025</creationDate>
+    <copyright>(C) 2025 Andrey Smirnikov</copyright>
     <license>GNU General Public License version 3 or later</license>
-    <version>1.1.0</version>
+    <version>1.2.0</version>
     <description>PLG_WTYOOTHEMEYANDEXMAP_DESC</description>
     <scriptfile>script.php</scriptfile>
     <namespace path="src">Joomla\Plugin\System\WtYoothemeYandexMap</namespace>
@@ -27,15 +27,18 @@
         <fields name="params">
             <fieldset name="basic">
                 <field addfieldprefix="Joomla\Plugin\System\WtYoothemeYandexMap\Fields"
-                       type="plugininfo" name="plugininfo"/>
-                <field name="yandex_map_api_key"
-                       type="text"
+                       type="plugininfo"
+                       name="plugininfo"
+                />
+                <field type="text"
+                       name="yandex_map_api_key"
                        label="PLG_WTYOOTHEMEYANDEXMAP_API_KEY_FIELD"
                 />
                 <field type="radio"
                        name="yandex_map_api_type"
                        label="PLG_WTYOOTHEMEYANDEXMAP_API_TYPE"
-                       default="free" class="btn-group btn-group-yesno">
+                       default="free"
+                       class="btn-group btn-group-yesno">
                     <option value="free">PLG_WTYOOTHEMEYANDEXMAP_API_TYPE_FREE</option>
                     <option value="paid">PLG_WTYOOTHEMEYANDEXMAP_API_TYPE_PAID</option>
                 </field>

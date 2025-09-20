@@ -33,9 +33,8 @@ $el = $this->el('div', [
 ]);
 
 $options = [];
-foreach ($props as $k => $v)
-{
-    $options[$k] = $v;
+foreach ($props as $key => $value) {
+    $options[$key] = $value;
 }
 
 $script = $this->el('script', ['type' => 'application/json'], json_encode($options));

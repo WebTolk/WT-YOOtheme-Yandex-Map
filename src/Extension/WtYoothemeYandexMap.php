@@ -1,21 +1,21 @@
 <?php
 /**
- * @package       WT YOOTheme Yandex Map
- * @version       1.1.0
- * @Author        Andrey Smirnikov, https://web-tolk.ru
- * @copyright     Copyright (C) 2024 Andrey Smirnikov
- * @license       GNU/GPL http://www.gnu.org/licenses/gpl-3.0.html
- * @since         1.0.0
+ * @package    WT YOOTheme Yandex Map
+ * @version    1.2.0
+ * @Author     Andrey Smirnikov, https://web-tolk.ru
+ * @copyright  Copyright (C) 2025 Andrey Smirnikov
+ * @license    GNU/GPL http://www.gnu.org/licenses/gpl-3.0.html
+ * @since      1.0.0
  */
 
 namespace Joomla\Plugin\System\WtYoothemeYandexMap\Extension;
 
-// No direct access
-defined('_JEXEC') or die;
-
 use Joomla\CMS\Plugin\CMSPlugin;
 use Joomla\Event\SubscriberInterface;
 use YOOtheme\Application;
+
+// No direct access
+defined('_JEXEC') or die;
 
 class WtYoothemeYandexMap extends CMSPlugin implements SubscriberInterface
 {
@@ -26,7 +26,7 @@ class WtYoothemeYandexMap extends CMSPlugin implements SubscriberInterface
      *
      * @return  array
      *
-     * @since   4.0.0
+     * @since   1.0.0
      */
     public static function getSubscribedEvents(): array
     {
@@ -37,8 +37,7 @@ class WtYoothemeYandexMap extends CMSPlugin implements SubscriberInterface
 
     public function onAfterInitialise(): void
     {
-        if (!class_exists(Application::class, false))
-        {
+        if (!class_exists(Application::class, false)) {
             return;
         }
 

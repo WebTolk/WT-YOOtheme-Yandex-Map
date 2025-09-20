@@ -10,8 +10,6 @@
 </ul>
 <?php elseif (count($children) == 1) : ?>
 <div>
-
     <?= $builder->render($children[0], ['element' => $props]) ?>
-
 </div>
 <?php endif ?>
