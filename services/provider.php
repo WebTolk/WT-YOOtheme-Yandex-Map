@@ -25,7 +25,7 @@ return new class implements ServiceProviderInterface {
         $container->set(
             PluginInterface::class,
             function (Container $container) {
-                $config = (array)PluginHelper::getPlugin('system', 'wtyoothemeyandexmap');
+                $config = (array) PluginHelper::getPlugin('system', 'wtyoothemeyandexmap');
                 $subject = $container->get(DispatcherInterface::class);
 
                 $plugin = new WtYoothemeYandexMap($subject, $config);
