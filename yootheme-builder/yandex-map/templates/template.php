@@ -18,7 +18,7 @@ $el = $this->el('div', [
     ],
 
     'style' => [
-        'width: {width}px',
+        'width: {width}px;',
         'height: 300px {@!height} {@!viewport_height}',
         'height: {height}px {@!viewport_height}',
         'height: 100vh {@viewport_height: viewport} {@!viewport_height_viewport} {@!viewport_height_offset_top}',

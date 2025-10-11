@@ -4,7 +4,8 @@
     "title": "Yandex Map Item",
     "width": 500,
     "defaults": {
-        "location": "51.533562,46.034266"
+        "location": "51.533562,46.034266",
+        "popup_position": "top"
     },
     "fields": {
         "location": {
@@ -69,6 +70,26 @@
             },
             "enable": "marker_icon"
         },
+        "marker_color": {
+            "label": "Marker Color",
+            "type": "color"
+        },
+        "marker_icon_offset_x": {
+            "label": "Offset X",
+            "type": "number",
+            "attrs": {
+                "placeholder": "auto"
+            },
+            "enable": "marker_icon"
+        },
+        "marker_icon_offset_y": {
+            "label": "Offset Y",
+            "type": "number",
+            "attrs": {
+                "placeholder": "auto"
+            },
+            "enable": "marker_icon"
+        },
         "hide": {
             "label": "Marker",
             "type": "checkbox",
@@ -79,9 +100,20 @@
             "type": "checkbox",
             "text": "Show popup on load"
         },
+        "popup_position": {
+            "label": "Position",
+            "description": "Set popup position relative to marker",
+            "type": "select",
+            "options": {
+                "Top": "top",
+                "Left": "left",
+                "Right": "right"
+            },
+            "default": "top"
+        },
         "popup_padding": {
             "label": "Padding",
-            "description": "Set padding of popup container.",
+            "description": "Set padding of popup container",
             "type": "select",
             "options": {
                 "None": "",
@@ -92,24 +124,6 @@
                 "4": "p-4",
                 "5": "p-5"
             }
-        },
-        "image_focal_point": {
-            "label": "Focal Point",
-            "description": "Set a focal point to adjust the image focus when cropping.",
-            "type": "select",
-            "options": {
-                "Top Left": "top-left",
-                "Top Center": "top-center",
-                "Top Right": "top-right",
-                "Center Left": "center-left",
-                "Center Center": "",
-                "Center Right": "center-right",
-                "Bottom Left": "bottom-left",
-                "Bottom Center": "bottom-center",
-                "Bottom Right": "bottom-right"
-            },
-            "source": true,
-            "enable": "image"
         },
         "status": "${builder.statusItem}",
         "source": "${builder.source}"
@@ -132,11 +146,17 @@
                         "link_aria_label",
                         "marker_icon",
                         {
-                            "description": "Setting just one value preserves the original proportions. The image will be resized and cropped automatically, and where possible, high resolution images will be auto-generated.",
+                            "description": "Setting just one value preserves the original proportions. The image will be resized and cropped automatically, and where possible, high resolution images will be auto-generated",
                             "name": "_marker_dimension",
                             "type": "grid",
+                            "width": "1-3",
+                            "fields": ["marker_icon_width", "marker_icon_height", "marker_color"]
+                        },
+                        {
+                            "name": "_marker_offsets",
+                            "type": "grid",
                             "width": "1-2",
-                            "fields": ["marker_icon_width", "marker_icon_height"]
+                            "fields": ["marker_icon_offset_x", "marker_icon_offset_y"]
                         }
                     ]
                 },
@@ -153,12 +173,7 @@
                             "label": "Popup",
                             "type": "group",
                             "divider": true,
-                            "fields": ["show_popup", "popup_padding"]
-                        },
-                        {
-                            "label": "Image",
-                            "type": "group",
-                            "fields": ["image_focal_point"]
+                            "fields": ["show_popup", "popup_position", "popup_padding"]
                         }
                     ]
                 },

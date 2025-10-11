@@ -30,6 +30,16 @@
                        type="plugininfo"
                        name="plugininfo"
                 />
+                <field type="note"
+                       name="yandex_map_api_note"
+                       description="PLG_WTYOOTHEMEYANDEXMAP_API_NOTE"
+                       class="col-12 alert alert-info"
+                />
+                <field type="note"
+                       name="yandex_map_api_warning"
+                       description="PLG_WTYOOTHEMEYANDEXMAP_API_WARNING"
+                       class="col-12 alert alert-danger"
+                />
                 <field type="text"
                        name="yandex_map_api_key"
                        label="PLG_WTYOOTHEMEYANDEXMAP_API_KEY_FIELD"

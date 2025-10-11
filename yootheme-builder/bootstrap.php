@@ -8,11 +8,11 @@
  * @since      1.0.0
  */
 
-include_once __DIR__ . '/src/CustomizerListener.php';
-include_once __DIR__ . '/src/YandexMapApiHelper.php';
-
 use YOOtheme\Builder;
 use YOOtheme\Path;
+
+include_once __DIR__ . '/src/CustomizerListener.php';
+include_once __DIR__ . '/src/YandexMapApiHelper.php';
 
 // No direct access
 defined('_JEXEC') or die;
