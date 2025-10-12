@@ -157,9 +157,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 _createMarker() {
                     const marker = super._createMarker();
-                    /*if (this._props.markerProps['show_popup']) {
-                        this._togglePopup(1);
-                    }*/
                     return marker;
                 }
 
@@ -463,16 +460,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
             addMapControl('show_zoom_controls', new YMapZoomControl());
 
-            const fullScreenBtn = document.createElement('ymaps');
+            const fullScreenBtn = document.createElement('div');
             fullScreenBtn.classList.add('ymaps3x0--control-fullscreen');
+            fullScreenBtn.innerHTML = `
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <g clip-path="url(#clip0_1470_10318)" transform="matrix(0.938241, 0, 0, 0.938102, -1.285652, -1.081787)">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M23.752 4.59473C23.7619 4.45662 23.6471 4.3418 23.5089 4.35171L18.4336 4.71611C18.1746 4.7347 18.0574 5.04912 18.241 5.23274L19.7842 6.776L14.771 11.7892L16.3141 13.3323L21.3273 8.31911L22.8709 9.86269C23.0545 10.0463 23.369 9.92909 23.3876 9.67008L23.752 4.59473Z" fill="currentColor"/>
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M4.56835 23.2952C4.55844 23.4333 4.67326 23.5481 4.81137 23.5382L9.88672 23.1738C10.1457 23.1552 10.263 22.8408 10.0793 22.6571L8.53608 21.1139L13.5493 16.1007L12.0062 14.5576L6.99297 19.5708L5.44938 18.0272C5.26577 17.8436 4.95134 17.9608 4.93275 18.2198L4.56835 23.2952Z" fill="currentColor"/>
+                  </g>
+                  <defs>
+                    <clipPath id="clip0_1470_10318">
+                      <rect width="24" height="24" fill="white"/>
+                    </clipPath>
+                  </defs>
+                </svg>
+            `;
             addMapControl('show_fullscreen_control', new ymaps3.YMapControlButton({
                 onClick: () => {
                     if (document.fullscreenElement) {
                         document.exitFullscreen();
-                        fullScreenBtn.classList.remove('ymaps3x0--control-fullscreen-out');
+                        fullScreenBtn.classList.remove('text-primary');
                     } else {
                         map.container.parentNode.requestFullscreen();
-                        fullScreenBtn.classList.add('ymaps3x0--control-fullscreen-out');
+                        fullScreenBtn.classList.add('text-primary');
                     }
                 },
                 element: fullScreenBtn
@@ -514,9 +524,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 const panel = yandexmapProps['show_ruler_control_panel'];
                 const order = yandexmapProps['show_ruler_control_order'];
 
+                const rulerIcon = document.createElement('div');
+                rulerIcon.classList.add('ymaps3x0--control-ruler');
+                rulerIcon.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3.56 14.363L14.363 3.56a1.91 1.91 0 0 1 2.7 0l3.377 3.376a1.91 1.91 0 0 1 0 2.7L9.636 20.442a1.91 1.91 0 0 1-2.7 0l-3.377-3.377a1.91 1.91 0 0 1 0-2.7zm4.12-.743l1.282-1.282 1.823 1.824a.764.764 0 1 0 1.08-1.082l-1.824-1.822 1.216-1.215 1.148 1.145a.763.763 0 0 0 1.318-.534.765.765 0 0 0-.237-.545l-1.148-1.147 1.282-1.283 1.824 1.824a.764.764 0 0 0 1.08-1.082l-1.825-1.824 1.014-1.012a.478.478 0 1 0-.676-.675L4.91 15.038a.478.478 0 0 0 .675.675l1.012-1.012 1.15 1.146a.764.764 0 1 0 1.08-1.079L7.679 13.62v.001z" fill="currentColor"></path></svg>';
                 mapControls[panel].list.push({value: new ymaps3.YMapControlButton({
-                    onClick: (e) => {
-                        e.target.classList.toggle('text-primary');
+                    onClick: () => {
+                        rulerIcon.classList.toggle('text-primary');
 
                         if (!rulerActive) {
                             rulerComponent.update({type: 'ruler', editable: true});
@@ -538,7 +551,8 @@ document.addEventListener('DOMContentLoaded', () => {
                             rulerActive = false;
                         }
                     },
-                    text: 'Линейка'
+                    //text: 'Линейка'
+                    element: rulerIcon
                 }), priority: order});
             }
             // МОДУЛЬ ЛИНЕЙКИ КОНЕЦ
