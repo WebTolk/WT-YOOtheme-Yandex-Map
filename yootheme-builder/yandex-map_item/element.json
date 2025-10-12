@@ -111,6 +111,20 @@
             },
             "default": "top"
         },
+        "popup_min_width": {
+            "label": "Min Width",
+            "description": "Set the minimum width of popup container",
+            "attrs": {
+                "placeholder": "px, %, vw, vh, em, rem"
+            }
+        },
+        "popup_max_width": {
+            "label": "Max Width",
+            "description": "Set the maximum width of popup container",
+            "attrs": {
+                "placeholder": "px, %, vw, vh, em, rem"
+            }
+        },
         "popup_padding": {
             "label": "Padding",
             "description": "Set padding of popup container",
@@ -173,7 +187,7 @@
                             "label": "Popup",
                             "type": "group",
                             "divider": true,
-                            "fields": ["show_popup", "popup_position", "popup_padding"]
+                            "fields": ["show_popup", "popup_position", "popup_min_width", "popup_max_width", "popup_padding"]
                         }
                     ]
                 },

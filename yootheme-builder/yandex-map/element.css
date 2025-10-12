@@ -1,6 +1,6 @@
 .ymaps3x0--default-marker__title-wrapper
 {
-    max-width: unset !important;
+    max-width: 256px !important;
 }
 
 .ymaps3--suggest-control
@@ -95,7 +95,7 @@ ymaps.ymaps3x0--marker .cluster > .cluster-text
     color: white;
     font-size: 1.125rem;
     text-align: center;
-    z-index: 999;
+    z-index: 9999;
     pointer-events: none;
     opacity: 0;
     transition: opacity 0.3s;

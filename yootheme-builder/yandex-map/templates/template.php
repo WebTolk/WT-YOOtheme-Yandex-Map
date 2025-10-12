@@ -40,7 +40,6 @@ foreach ($props as $key => $value) {
 $script = $this->el('script', ['type' => 'application/json'], json_encode($options));
 
 ?>
-<p class="uk-hidden@s uk-text-center uk-margin-top">Передвинуть карту можно двумя пальцами</p>
 <?= $el($props, $attrs); ?>
     <?= $script(); ?>
 <?= $el->end(); ?>

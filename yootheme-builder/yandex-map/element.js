@@ -79,15 +79,15 @@ document.addEventListener('DOMContentLoaded', () => {
                             e.className += ' ' + (this._props.markerProps['popup_padding'] || this._props.props['popup_padding']);
                         }
                         e.innerHTML = t;
+                        this._popup.appendChild(e);
                         // set popup minimum width
-                        if (this._props.props['popup_min_width']) {
-                            e.style.minWidth = this._props.props['popup_min_width'];
+                        if (this._props.markerProps['popup_min_width'] || this._props.props['popup_min_width']) {
+                            this._popup.style.minWidth = this._props.markerProps['popup_min_width'] || this._props.props['popup_min_width'];
                         }
                         // set popup maximum width
-                        if (this._props.props['popup_max_width']) {
-                            e.style.maxWidth = this._props.props['popup_max_width'];
+                        if (this._props.markerProps['popup_max_width'] || this._props.props['popup_max_width']) {
+                            this._popup.style.maxWidth = this._props.markerProps['popup_max_width'] || this._props.props['popup_max_width'];
                         }
-                        this._popup.appendChild(e);
                         const o = document.createElement("button");
                         o.className = 'btn-close';
                         o.onclick = () => this._togglePopup(!1);
@@ -162,7 +162,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 _image(icon, width, height, offsetX, offsetY) {
                     const elem = document.createElement('img');
-                    elem.src = (icon.startsWith('/') ? '' : '/') + icon;
+                    elem.src = processSrc(icon);
                     if (width) {
                         elem.style.width = width + 'px';
                         elem.style.maxWidth = 'unset';
@@ -417,7 +417,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Закрываем всплывающее окно при клике вне его области
                 map.addChild(new ymaps3.YMapListener({
                     layer: 'any',
-                    onClick: (object, event) => {
+                    onClick: (object) => {
                         if (lastMarkerWithOpenedPopup && !object) {
                             lastMarkerWithOpenedPopup._togglePopup(0);
                         }
@@ -587,6 +587,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                     searchResultMarker._container.style.cursor = 'pointer';
                     map.addChild(searchResultMarker);
+
+                    const title = searchResultMarker._marker.element.querySelector('.ymaps3x0--default-marker__title');
+                    if (title.scrollWidth > title.offsetWidth) {
+                        title.title = title.textContent;
+                    }
+
+                    const subtitle = searchResultMarker._marker.element.querySelector('.ymaps3x0--default-marker__subtitle');
+                    if (subtitle.scrollWidth > subtitle.offsetWidth) {
+                        subtitle.title = subtitle.textContent;
+                    }
+
                     lastSearchedMarkers.push(searchResultMarker);
                 });
 
@@ -634,7 +645,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 clearSearchResultHandler();
             });
 
-            // Логика перетаскивания карты только двумя пальцами
+            // Логика перетаскивания карты двумя пальцами для моб. устройств
             if (isMobileDevice()) {
                 let hint = document.createElement('div');
                 hint.innerHTML = 'Передвинуть карту можно двумя пальцами';
@@ -653,7 +664,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 });
                 elem.addEventListener('touchmove', e => {
-                    if (touchCount === 1 && Date.now() - touchStartTime > 100) {
+                    if (!lastMarkerWithOpenedPopup && touchCount === 1 && Date.now() - touchStartTime > 100) {
                         hint.style.opacity = '1';
                     }
                 });
@@ -690,6 +701,17 @@ function isMobileDevice() {
     return isMobileUserAgent && hasTouch;
 }
 
+function processSrc(value) {
+    let srcAttr = '';
+
+    if (value && !value.startsWith('/') && !value.startsWith('http://') && !value.startsWith('https://')) {
+        srcAttr = '/';
+    }
+
+    srcAttr += value;
+    return srcAttr;
+}
+
 function cluster(yandexmapProps, count) {
     const clusterEl = document.createElement('div');
     clusterEl.classList.add('cluster');
@@ -707,7 +729,7 @@ function cluster(yandexmapProps, count) {
 
         const iconWithImage = document.createElement('img');
         iconWithImage.classList.add('cluster-icon-image');
-        iconWithImage.src = (icon.startsWith('/') ? '' : '/') + icon;
+        iconWithImage.src = processSrc(icon);
         if (width) {
             iconWithImage.style.width = width + 'px';
         }
@@ -792,7 +814,7 @@ function popupImage(props, marker) {
     }
 
     const img = document.createElement('img');
-    img.src = (marker['image'].startsWith('/') ? '' : '/') + marker['image'];
+    img.src = processSrc(marker['image']);
     if (marker['image_alt']) {
         img.alt = marker['image_alt'];
     }
