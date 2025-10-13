@@ -366,10 +366,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     const markerCfg = {
                         coordinates: [parseFloat(parseFloat(lng).toFixed(6)), parseFloat(parseFloat(lat).toFixed(6))],
-                        popup: {content: contentHTML, position: markerData['popup_position']},
                         props: yandexmapProps,
                         markerProps: markerData
                     };
+                    if (!markerData['hide_popup']) {
+                        markerCfg.popup = {
+                            content: contentHTML,
+                            position: markerData['popup_position']
+                        };
+                    }
                     if (yandexmapProps['show_title'] && markerData['title']) {
                         markerCfg.title = markerData['title'];
                     }

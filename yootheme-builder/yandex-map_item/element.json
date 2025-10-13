@@ -93,7 +93,12 @@
         "hide": {
             "label": "Marker",
             "type": "checkbox",
-            "text": "Hide marker"
+            "text": "Hide"
+        },
+        "hide_popup": {
+            "label": "Popup",
+            "type": "checkbox",
+            "text": "Hide"
         },
         "show_popup": {
             "label": "Behavior",
@@ -187,7 +192,7 @@
                             "label": "Popup",
                             "type": "group",
                             "divider": true,
-                            "fields": ["show_popup", "popup_position", "popup_min_width", "popup_max_width", "popup_padding"]
+                            "fields": ["hide_popup", "show_popup", "popup_position", "popup_min_width", "popup_max_width", "popup_padding"]
                         }
                     ]
                 },
