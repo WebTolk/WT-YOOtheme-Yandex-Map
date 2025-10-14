@@ -73,10 +73,28 @@ document.addEventListener('DOMContentLoaded', () => {
                     ) {
                         this._popup.classList.add(`${k}popup`);
                         const e = document.createElement("ymaps");
-                        e.className = `${k}popup-container`;
+                        e.classList.add(`${k}popup-container`);
                         // set popup padding
                         if (this._props.markerProps['popup_padding'] || this._props.props['popup_padding']) {
-                            e.className += ' ' + (this._props.markerProps['popup_padding'] || this._props.props['popup_padding']);
+                            e.classList.add(this._props.markerProps['popup_padding'] || this._props.props['popup_padding']);
+                        }
+                        if (this._props.markerProps['popup_padding_remove_top']) {
+                            e.classList.add('uk-padding-remove-top');
+                        }
+                        if (this._props.markerProps['popup_padding_remove_bottom']) {
+                            e.classList.add('uk-padding-remove-bottom');
+                        }
+                        if (this._props.markerProps['popup_padding_remove_left']) {
+                            e.classList.add('uk-padding-remove-left');
+                        }
+                        if (this._props.markerProps['popup_padding_remove_right']) {
+                            e.classList.add('uk-padding-remove-right');
+                        }
+                        if (this._props.markerProps['popup_padding_remove_horizontal']) {
+                            e.classList.add('uk-padding-remove-horizontal');
+                        }
+                        if (this._props.markerProps['popup_padding_remove_vertical']) {
+                            e.classList.add('uk-padding-remove-vertical');
                         }
                         e.innerHTML = t;
                         this._popup.appendChild(e);
@@ -129,21 +147,12 @@ document.addEventListener('DOMContentLoaded', () => {
                         let offsetInLatitude = 0;
 
                         if (this._popupProps.position === 'top') {
-                            const latitudeYDiff = Math.abs(map.bounds[0][1] - map.bounds[1][1]);
-                            const latitudePerPixel = latitudeYDiff / map.size.y;
-
-                            let offsetInPixels = 70 + this._popup.offsetHeight / 2;
-
-                            offsetInLatitude = offsetInPixels * latitudePerPixel;
+                            offsetInLatitude = convertPixelOffsetToLatitude(map, 70 + this._popup.offsetHeight / 2);
                         } else {
-                            const longitudeXDiff = Math.abs(map.bounds[0][0] - map.bounds[1][0]);
-                            const longitudePerPixel = longitudeXDiff / map.size.x;
-
-                            let offsetInPixels = 26 + this._popup.offsetWidth / 2;
+                            offsetInLongitude = convertPixelOffsetToLongitude(map, 26 + this._popup.offsetWidth / 2);
                             if (this._popupProps.position === 'left') {
-                                offsetInPixels *= -1;
+                                offsetInLongitude *= -1;
                             }
-                            offsetInLongitude = offsetInPixels * longitudePerPixel;
                         }
 
                         let moveTo = [this._props.coordinates[0] + offsetInLongitude, this._props.coordinates[1] + offsetInLatitude];
@@ -401,8 +410,12 @@ document.addEventListener('DOMContentLoaded', () => {
                         }, cluster(yandexmapProps, features.length).cloneNode(true));
                     }
 
+                    let clusterGridSize = yandexmapProps['cluster_grid_size'];
+                    if (!clusterGridSize || clusterGridSize < 1) {
+                        clusterGridSize = 1;
+                    }
                     const clusterer = new CustomMapClusterer({
-                        method: customClusterByGrid({gridSize: 64}),
+                        method: customClusterByGrid({gridSize: clusterGridSize}),
                         features: featureList,
                         marker: markerRendering,
                         cluster: clusterRendering
@@ -431,8 +444,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 // центрируем карту так, чтобы вместить все установленные маркеры
                 if (yandexmapProps['centering_mode'] === 'fitAllMarkers') {
-                    const bounds = getBounds(markers.map((val) => val.coordinates));
-                    map.update({location: {bounds: bounds, easing: 'ease-in-out', duration: 400}});
+                    const bounds = getBounds(markers.map(val => val.coordinates));
+                    bounds[0][1] += convertPixelOffsetToLatitude(map, yandexmapProps['center_offset_y'] || 0);
+                    bounds[1][1] += convertPixelOffsetToLatitude(map, yandexmapProps['center_offset_y'] || 0);
+                    bounds[0][0] -= convertPixelOffsetToLongitude(map ,yandexmapProps['center_offset_x'] || 0);
+                    bounds[1][0] -= convertPixelOffsetToLongitude(map ,yandexmapProps['center_offset_x'] || 0);
+
+                    if (markers.length === 1) {
+                        map.update({location: {center: [bounds[0][0], bounds[0][1]], easing: 'ease-in-out', duration: 400}});
+                    } else if (markers.length > 1) {
+                        map.update({location: {bounds: bounds, easing: 'ease-in-out', duration: 400}});
+                    }
                 }
             }
 
@@ -603,7 +625,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (results.length === 1) {
                     map.update({location: {center: results[0].geometry.coordinates, easing: 'ease-in-out', zoom: 17, duration: 400}});
-                } else if (results.length >= 1) {
+                } else if (results.length > 1) {
                     map.update({location: {bounds: getBounds(results.map(result => result.geometry.coordinates)), easing: 'ease-in-out', duration: 400}});
                 }
             };
@@ -773,6 +795,22 @@ function getBounds(coordinates) {
         [minLng, minLat],
         [maxLng, maxLat]
     ];
+}
+
+function convertPixelOffsetToLatitude(map, pixelOffset) {
+    const latitudeYDiff = Math.abs(map.bounds[0][1] - map.bounds[1][1]);
+    const latitudePerPixel = latitudeYDiff / map.size.y;
+    console.log(latitudeYDiff);
+    console.log(map.size.y);
+    console.log(pixelOffset);
+    console.log(latitudeYDiff / map.size.y * pixelOffset);
+    return pixelOffset * latitudePerPixel;
+}
+
+function convertPixelOffsetToLongitude(map, pixelOffset) {
+    const longitudeXDiff = Math.abs(map.bounds[0][0] - map.bounds[1][0]);
+    const longitudePerPixel = longitudeXDiff / map.size.x;
+    return pixelOffset * longitudePerPixel;
 }
 
 function popupLink(props, marker) {

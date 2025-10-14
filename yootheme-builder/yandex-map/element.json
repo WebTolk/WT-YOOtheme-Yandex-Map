@@ -34,6 +34,7 @@
         "min_zoom": 0,
         "max_zoom": 21,
         "map_theme": "light",
+        "cluster_grid_size": 64,
         "marker_color": "#FF3333",
         "title_hover_style": "reset",
         "title_element": "h3",
@@ -174,16 +175,6 @@
                 "Satellite": "satellite"
             }
         },
-        "center_lat": {
-            "label": "Latitude",
-            "type": "number",
-            "enable": "centering_mode == 'fromCoords'"
-        },
-        "center_lng": {
-            "label": "Longitude",
-            "type": "number",
-            "enable": "centering_mode == 'fromCoords'"
-        },
         "zoom": {
             "label": "Zoom",
             "description": "Set the initial resolution at which to display the map. 0 is fully zoomed out and 18 is at the highest resolution zoomed in.",
@@ -212,6 +203,26 @@
                 "Fit all markers": "fitAllMarkers"
             },
             "default": "fromCoords"
+        },
+        "center_lat": {
+            "label": "Latitude",
+            "type": "number",
+            "enable": "centering_mode == 'fromCoords'"
+        },
+        "center_lng": {
+            "label": "Longitude",
+            "type": "number",
+            "enable": "centering_mode == 'fromCoords'"
+        },
+        "center_offset_x": {
+            "label": "Offset X",
+            "type": "number",
+            "enable": "centering_mode == 'fitAllMarkers'"
+        },
+        "center_offset_y": {
+            "label": "Offset Y",
+            "type": "number",
+            "enable": "centering_mode == 'fitAllMarkers'"
         },
         "map_padding": {
             "label": "Padding (in %)",
@@ -492,6 +503,11 @@
             "type": "checkbox",
             "text": "Enable marker clustering"
         },
+        "cluster_grid_size": {
+            "label": "Cluster grid size",
+            "type": "number",
+            "default": 64
+        },
         "popup_min_width": {
             "label": "Min Width",
             "description": "Set the minimum width of popup container",
@@ -517,7 +533,10 @@
                 "2": "p-2",
                 "3": "p-3",
                 "4": "p-4",
-                "5": "p-5"
+                "5": "p-5",
+                "uk-padding-small": "uk-padding-small",
+                "uk-padding": "uk-padding",
+                "uk-padding-large": "uk-padding-large"
             }
         },
         "title_style": {
@@ -984,6 +1003,12 @@
                                     "width": "1-2",
                                     "fields": ["center_lat", "center_lng"]
                                 },
+                                {
+                                    "name": "_center_offsets",
+                                    "type": "grid",
+                                    "width": "1-2",
+                                    "fields": ["center_offset_x", "center_offset_y"]
+                                },
                                 "map_padding",
                                 "zoom",
                                 "min_zoom",
@@ -1106,9 +1131,9 @@
                         },
                         {
                             "label": "Clustering",
-                            "type": "grid",
+                            "type": "group",
                             "divider": true,
-                            "fields": ["clustering"]
+                            "fields": ["clustering", "cluster_grid_size"]
                         },
                         {
                             "label": "Popup",

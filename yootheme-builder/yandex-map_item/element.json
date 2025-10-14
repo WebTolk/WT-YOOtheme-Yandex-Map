@@ -141,8 +141,35 @@
                 "2": "p-2",
                 "3": "p-3",
                 "4": "p-4",
-                "5": "p-5"
+                "5": "p-5",
+                "uk-padding-small": "uk-padding-small",
+                "uk-padding": "uk-padding",
+                "uk-padding-large": "uk-padding-large"
             }
+        },
+        "popup_padding_remove_top": {
+            "label": "uk-padding-remove-top",
+            "type": "checkbox"
+        },
+        "popup_padding_remove_bottom": {
+            "label": "uk-padding-remove-bottom",
+            "type": "checkbox"
+        },
+        "popup_padding_remove_left": {
+            "label": "uk-padding-remove-left",
+            "type": "checkbox"
+        },
+        "popup_padding_remove_right": {
+            "label": "uk-padding-remove-right",
+            "type": "checkbox"
+        },
+        "popup_padding_remove_horizontal": {
+            "label": "uk-padding-remove-horizontal",
+            "type": "checkbox"
+        },
+        "popup_padding_remove_vertical": {
+            "label": "uk-padding-remove-vertical",
+            "type": "checkbox"
         },
         "status": "${builder.statusItem}",
         "source": "${builder.source}"
@@ -192,7 +219,20 @@
                             "label": "Popup",
                             "type": "group",
                             "divider": true,
-                            "fields": ["hide_popup", "show_popup", "popup_position", "popup_min_width", "popup_max_width", "popup_padding"]
+                            "fields": ["hide_popup", "show_popup", "popup_position", "popup_min_width", "popup_max_width"]
+                        },
+                        {
+                            "label": "Padding",
+                            "type": "group",
+                            "fields": [
+                                "popup_padding",
+                                "popup_padding_remove_top",
+                                "popup_padding_remove_bottom",
+                                "popup_padding_remove_left",
+                                "popup_padding_remove_right",
+                                "popup_padding_remove_horizontal",
+                                "popup_padding_remove_vertical"
+                            ]
                         }
                     ]
                 },
