@@ -89,7 +89,9 @@ document.addEventListener('DOMContentLoaded', () => {
                             this._popup.style.maxWidth = this._props.markerProps['popup_max_width'] || this._props.props['popup_max_width'];
                         }
                         const o = document.createElement("button");
-                        o.className = 'btn-close';
+                        o.className = 'uk-modal-close-default';
+                        o.type = 'button';
+                        o.setAttribute('uk-close', '');
                         o.onclick = () => this._togglePopup(!1);
                         this._popup.appendChild(o);
                     } else {
@@ -116,23 +118,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
                         this._marker.update({hideOutsideViewport: false});
 
+                        const popupContainer = this._popup.querySelector(`.${k}popup-container`);
+                        popupContainer.style.maxHeight = (map.size.y - 42 - 72 * 2) + 'px';
+                        popupContainer.style.overflow = "auto";
+                        popupContainer.addEventListener('wheel', e => {
+                            e.stopPropagation();
+                        });
+
                         let offsetInLongitude = 0;
                         let offsetInLatitude = 0;
-                        const sqrt2 = Math.sqrt(2);
 
                         if (this._popupProps.position === 'top') {
                             const latitudeYDiff = Math.abs(map.bounds[0][1] - map.bounds[1][1]);
                             const latitudePerPixel = latitudeYDiff / map.size.y;
 
-                            let offsetInPixels = this._marker.element.offsetHeight + this._popup.offsetHeight / 2;
-                            const maxOffsetInPixels = map.size.y / 2;
+                            let offsetInPixels = 70 + this._popup.offsetHeight / 2;
 
-                            offsetInLatitude = Math.min(offsetInPixels, maxOffsetInPixels) * sqrt2 * latitudePerPixel;
+                            offsetInLatitude = offsetInPixels * latitudePerPixel;
                         } else {
                             const longitudeXDiff = Math.abs(map.bounds[0][0] - map.bounds[1][0]);
                             const longitudePerPixel = longitudeXDiff / map.size.x;
 
-                            let offsetInPixels = this._popup.offsetWidth / 2 + 60 * sqrt2;
+                            let offsetInPixels = 26 + this._popup.offsetWidth / 2;
                             if (this._popupProps.position === 'left') {
                                 offsetInPixels *= -1;
                             }
@@ -141,23 +148,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
                         let moveTo = [this._props.coordinates[0] + offsetInLongitude, this._props.coordinates[1] + offsetInLatitude];
                         map.update({location: {center: moveTo, easing: 'ease-in-out', duration: 400}});
-
-                        const popupContainer = this._popup.querySelector(`.${k}popup-container`);
-                        popupContainer.style.maxHeight = (map.size.y - this._marker.element.offsetHeight - sqrt2 * (24 + 16)) + 'px';
-                        popupContainer.style.overflow = "auto";
-                        popupContainer.addEventListener('wheel', e => {
-                            e.stopPropagation();
-                        });
                     } else {
                         lastMarkerWithOpenedPopup = null;
 
                         this._marker.update({hideOutsideViewport: true});
                     }
-                }
-
-                _createMarker() {
-                    const marker = super._createMarker();
-                    return marker;
                 }
 
                 _image(icon, width, height, offsetX, offsetY) {

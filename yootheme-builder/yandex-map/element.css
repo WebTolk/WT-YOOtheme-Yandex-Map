@@ -13,24 +13,39 @@ ymaps.ymaps3x0--default-marker__popup
     flex-direction: column-reverse;
     padding: 0;
     gap: 4px;
+    z-index: 1;
+}
+
+.ymaps3x0--default-marker__popup_left
+{
+    position: absolute !important;
+    transform: translate(calc(-100% - 26px), calc(-50%)) !important;
+}
+
+.ymaps3x0--default-marker__popup_right
+{
+    position: absolute !important;
+    transform: translate(26px, calc(-50%)) !important;
 }
 
 ymaps.ymaps3x0--default-marker__popup-container
 {
+    box-sizing: border-box;
     max-width: 100%;
     width: 100%;
-    padding: 0rem 1rem 0.5rem;
     text-wrap: wrap;
 }
 
-.ymaps3x0--default-marker__popup .btn-close
+.ymaps3x0--default-marker__popup button[uk-close]
 {
+    position: relative;
+    top: 0;
+    right: 0;
     margin-left: auto;
     padding: 0.75rem;
-    cursor: pointer;
 }
 
-.ymaps3x0--default-marker__popup .btn-close:focus
+.ymaps3x0--default-marker__popup button[uk-close]:focus
 {
     box-shadow: none;
 }
@@ -105,4 +120,8 @@ ymaps.ymaps3x0--marker .cluster > .cluster-text
 ymaps.ymaps3x0--map-container svg
 {
     max-width: unset;
+}
+
+.ymaps3x0--map {
+    touch-action: pan-y !important;
 }
