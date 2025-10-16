@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     zoom: yandexmapProps['zoom'],
                 },
                 showScaleInCopyrights: true,
-                behaviors: [],
+                behaviors: ['pinchRotate'],
                 margin: [marginPx, marginPx, marginPx, marginPx]
             };
 
@@ -143,17 +143,22 @@ document.addEventListener('DOMContentLoaded', () => {
                             e.stopPropagation();
                         });
 
-                        let offsetInLongitude = 0;
-                        let offsetInLatitude = 0;
+                        let xOffsetInPixels = 0;
+                        let yOffsetInPixels = 0;
 
                         if (this._popupProps.position === 'top') {
-                            offsetInLatitude = convertPixelOffsetToLatitude(map, 70 + this._popup.offsetHeight / 2);
+                            yOffsetInPixels = 70 + this._popup.offsetHeight / 2;
                         } else {
-                            offsetInLongitude = convertPixelOffsetToLongitude(map, 26 + this._popup.offsetWidth / 2);
+                            xOffsetInPixels = 26 + this._popup.offsetWidth / 2;
                             if (this._popupProps.position === 'left') {
-                                offsetInLongitude *= -1;
+                                xOffsetInPixels *= -1;
                             }
                         }
+
+                        const [rotatedXOffsetInPixels, rotatedYOffsetInPixels] = rotatePixelOffsets(xOffsetInPixels, yOffsetInPixels, -map.azimuth);
+
+                        const offsetInLongitude = convertPixelOffsetToLongitude(map, rotatedXOffsetInPixels);
+                        const offsetInLatitude = convertPixelOffsetToLatitude(map, rotatedYOffsetInPixels);
 
                         let moveTo = [this._props.coordinates[0] + offsetInLongitude, this._props.coordinates[1] + offsetInLatitude];
                         map.update({location: {center: moveTo, easing: 'ease-in-out', duration: 400}});
@@ -501,10 +506,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 onClick: () => {
                     if (document.fullscreenElement) {
                         document.exitFullscreen();
-                        fullScreenBtn.classList.remove('text-primary');
+                        fullScreenBtn.classList.remove('ymaps-control-active');
                     } else {
                         map.container.parentNode.requestFullscreen();
-                        fullScreenBtn.classList.add('text-primary');
+                        fullScreenBtn.classList.add('ymaps-control-active');
                     }
                 },
                 element: fullScreenBtn
@@ -524,8 +529,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const rulerModeButton = new ymaps3.YMapControlButton({
                 onClick: () => {
                     rulerComponent.update({type: 'ruler'});
-                    rulerModeElem.classList.add('text-primary');
-                    planimeterModeElem.classList.remove('text-primary');
+                    rulerModeElem.classList.add('ymaps-control-active');
+                    planimeterModeElem.classList.remove('ymaps-control-active');
                 },
                 element: rulerModeElem
             });
@@ -535,8 +540,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const planimeterModeButton = new ymaps3.YMapControlButton({
                 onClick: () => {
                     rulerComponent.update({type: 'planimeter'});
-                    planimeterModeElem.classList.add('text-primary');
-                    rulerModeElem.classList.remove('text-primary');
+                    planimeterModeElem.classList.add('ymaps-control-active');
+                    rulerModeElem.classList.remove('ymaps-control-active');
                 },
                 element: planimeterModeElem
             });
@@ -551,14 +556,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 rulerIcon.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3.56 14.363L14.363 3.56a1.91 1.91 0 0 1 2.7 0l3.377 3.376a1.91 1.91 0 0 1 0 2.7L9.636 20.442a1.91 1.91 0 0 1-2.7 0l-3.377-3.377a1.91 1.91 0 0 1 0-2.7zm4.12-.743l1.282-1.282 1.823 1.824a.764.764 0 1 0 1.08-1.082l-1.824-1.822 1.216-1.215 1.148 1.145a.763.763 0 0 0 1.318-.534.765.765 0 0 0-.237-.545l-1.148-1.147 1.282-1.283 1.824 1.824a.764.764 0 0 0 1.08-1.082l-1.825-1.824 1.014-1.012a.478.478 0 1 0-.676-.675L4.91 15.038a.478.478 0 0 0 .675.675l1.012-1.012 1.15 1.146a.764.764 0 1 0 1.08-1.079L7.679 13.62v.001z" fill="currentColor"></path></svg>';
                 mapControls[panel].list.push({value: new ymaps3.YMapControlButton({
                     onClick: () => {
-                        rulerIcon.classList.toggle('text-primary');
+                        rulerIcon.classList.toggle('ymaps-control-active');
 
                         if (!rulerActive) {
                             rulerComponent.update({type: 'ruler', editable: true});
                             map.addChild(rulerComponent);
 
-                            rulerModeElem.classList.add('text-primary');
-                            planimeterModeElem.classList.remove('text-primary');
+                            rulerModeElem.classList.add('ymaps-control-active');
+                            planimeterModeElem.classList.remove('ymaps-control-active');
 
                             mapControls[panel].panel.addChild(rulerModeButton);
                             mapControls[panel].panel.addChild(planimeterModeButton);
@@ -593,8 +598,10 @@ document.addEventListener('DOMContentLoaded', () => {
             };
             const searchResultHandler = (results) => {
                 const searchControlInput = document.querySelector('.ymaps3--search-control__input');
-                searchControlInput.value = searchInputValue;
-                searchControlInput.dispatchEvent(new Event('input'));
+                if (searchControlInput) {
+                    searchControlInput.value = searchInputValue;
+                    searchControlInput.dispatchEvent(new Event('input'));
+                }
 
                 clearSearchResultHandler();
 
@@ -649,23 +656,30 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             // ограничиваем размер поисковых предложений размерами контейнера карты
-            document.querySelectorAll('.ymaps3--search-control').forEach(searchControl => {
-                searchControl.style.maxHeight = (map.size.y - 24) + 'px';
-            });
+            const yMaps3SearchControl = document.querySelector('.ymaps3--search-control');
+            if (yMaps3SearchControl) {
+                yMaps3SearchControl.style.maxHeight = (map.size.y - 24) + 'px';
+            }
             // сохраняем крайнее введенное значение при поиске
-            document.querySelector('.ymaps3--search-control__input').addEventListener('input', e => {
-                if (e.isTrusted) {
-                    searchInputValue = e.target.value;
-                    if (!e.target.value) {
-                        clearSearchResultHandler();
+            const yMaps3SearchControlInput = document.querySelector('.ymaps3--search-control__input');
+            if (yMaps3SearchControlInput) {
+                yMaps3SearchControlInput.addEventListener('input', e => {
+                    if (e.isTrusted) {
+                        searchInputValue = e.target.value;
+                        if (!e.target.value) {
+                            clearSearchResultHandler();
+                        }
                     }
-                }
-            });
+                });
+            }
             // удаляем маркеры при очищении поисковой строки
-            document.querySelector('.ymaps3--search-control__clear').addEventListener('click', e => {
-                searchInputValue = '';
-                clearSearchResultHandler();
-            });
+            const yMaps3SearchControlClear = document.querySelector('.ymaps3--search-control__clear');
+            if (yMaps3SearchControlClear) {
+                yMaps3SearchControlClear.addEventListener('click', e => {
+                    searchInputValue = '';
+                    clearSearchResultHandler();
+                });
+            }
 
             // Логика перетаскивания карты двумя пальцами для моб. устройств
             if (isMobileDevice()) {
@@ -676,8 +690,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 let touchCount = 0;
                 let touchStartTime = 0;
+
                 elem.addEventListener('touchstart', e => {
-                    touchCount = e.touches.length;
+                    touchCount = e.targetTouches.length;
                     if (touchCount === 1) {
                         touchStartTime = Date.now();
                     } else if (touchCount === 2) {
@@ -800,10 +815,6 @@ function getBounds(coordinates) {
 function convertPixelOffsetToLatitude(map, pixelOffset) {
     const latitudeYDiff = Math.abs(map.bounds[0][1] - map.bounds[1][1]);
     const latitudePerPixel = latitudeYDiff / map.size.y;
-    console.log(latitudeYDiff);
-    console.log(map.size.y);
-    console.log(pixelOffset);
-    console.log(latitudeYDiff / map.size.y * pixelOffset);
     return pixelOffset * latitudePerPixel;
 }
 
@@ -811,6 +822,12 @@ function convertPixelOffsetToLongitude(map, pixelOffset) {
     const longitudeXDiff = Math.abs(map.bounds[0][0] - map.bounds[1][0]);
     const longitudePerPixel = longitudeXDiff / map.size.x;
     return pixelOffset * longitudePerPixel;
+}
+
+function rotatePixelOffsets(x, y, angleInRad) {
+    const cos = Math.cos(angleInRad);
+    const sin = Math.sin(angleInRad);
+    return [x * cos + y * sin, -x * sin + y * cos];
 }
 
 function popupLink(props, marker) {

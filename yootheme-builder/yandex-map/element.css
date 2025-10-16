@@ -65,6 +65,11 @@ button.ymaps3x0--control-button:hover > :is(.ymaps3x0--control-fullscreen, .ymap
     color: #000;
 }
 
+.ymaps-control-active
+{
+    color: #0d6efd !important;
+}
+
 ymaps.ymaps3x0--marker .cluster
 {
     position: relative;
