@@ -696,8 +696,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (touchCount === 1) {
                         touchStartTime = Date.now();
                     } else if (touchCount === 2) {
-                        map.behaviors.push('drag');
-                        map.setBehaviors(map.behaviors);
+                        hint.style.opacity = '0';
+                        if (map.behaviors.indexOf('drag') === -1) {
+                            map.behaviors.push('drag');
+                            map.setBehaviors(map.behaviors);
+                        }
                     }
                 });
                 elem.addEventListener('touchmove', e => {
@@ -708,9 +711,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 elem.addEventListener('touchend', e => {
                     hint.style.opacity = '0';
 
-                    if (map.behaviors[map.behaviors.length - 1] === 'drag') {
-                        map.behaviors.pop();
-                        map.setBehaviors(map.behaviors);
+                    if (map.behaviors.indexOf('drag') !== -1) {
+                        map.setBehaviors(map.behaviors.filter(value => value !== 'drag'));
                     }
                 });
             }
