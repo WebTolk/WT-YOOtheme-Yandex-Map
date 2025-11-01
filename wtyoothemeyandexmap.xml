@@ -4,10 +4,10 @@
     <author>Andrey Smirnikov</author>
     <authorEmail>info@web-tolk.ru</authorEmail>
     <authorUrl>https://web-tolk.ru/</authorUrl>
-    <creationDate>12.10.2025</creationDate>
+    <creationDate>01.11.2025</creationDate>
     <copyright>(C) 2025 Andrey Smirnikov</copyright>
     <license>GNU General Public License version 3 or later</license>
-    <version>1.2.0</version>
+    <version>1.2.1</version>
     <description>PLG_WTYOOTHEMEYANDEXMAP_DESC</description>
     <scriptfile>script.php</scriptfile>
     <namespace path="src">Joomla\Plugin\System\WtYoothemeYandexMap</namespace>

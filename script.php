@@ -1,9 +1,9 @@
 <?php
 /**
  * @package    WT YOOTheme Yandex Map
- * @version    1.2.0
+ * @version    1.2.1
  * @Author     Andrey Smirnikov, https://web-tolk.ru
- * @copyright  Copyright (C) 2024 Andrey Smirnikov
+ * @copyright  Copyright (C) 2025 Andrey Smirnikov
  * @license    GNU/GPL http://www.gnu.org/licenses/gpl-3.0.html
  * @since      1.0.0
  */

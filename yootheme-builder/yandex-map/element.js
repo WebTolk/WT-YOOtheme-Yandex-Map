@@ -141,27 +141,49 @@ document.addEventListener('DOMContentLoaded', () => {
                         popupContainer.style.overflow = "auto";
                         popupContainer.addEventListener('wheel', e => {
                             e.stopPropagation();
-                        });
+                        }, {passive: true});
 
-                        let xOffsetInPixels = 0;
-                        let yOffsetInPixels = 0;
 
-                        if (this._popupProps.position === 'top') {
-                            yOffsetInPixels = 70 + this._popup.offsetHeight / 2;
-                        } else {
-                            xOffsetInPixels = 26 + this._popup.offsetWidth / 2;
-                            if (this._popupProps.position === 'left') {
-                                xOffsetInPixels *= -1;
-                            }
+                        let popupOffsetWidth = this._popup.offsetWidth;
+                        let popupOffsetHeight = this._popup.offsetHeight;
+
+                        const lazyImages = this._popup.querySelectorAll('img[loading="lazy"]');
+                        // если нет изображений с "ленивой" загрузкой,
+                        // сразу вызываем событие popupToggled
+                        if (lazyImages.length === 0) {
+                            this.popupFullyLoaded = true;
                         }
 
-                        const [rotatedXOffsetInPixels, rotatedYOffsetInPixels] = rotatePixelOffsets(xOffsetInPixels, yOffsetInPixels, -map.azimuth);
+                        if (this.popupFullyLoaded) {
+                            this._props.popupToggled(
+                                this._popupProps.position,
+                                this._props.coordinates,
+                                popupOffsetWidth,
+                                popupOffsetHeight
+                            );
+                        } else {
+                            let lazyImagesLoadedCount = 0;
+                            // если всплывающее окно содержит изображения с "ленивой" загрузкой,
+                            // то обновляем свойство высоты контейнера всплывающего окна
+                            lazyImages.forEach(img => {
+                                img.addEventListener('load', () => {
+                                    popupOffsetWidth = this._popup.offsetWidth;
+                                    popupOffsetHeight = this._popup.offsetHeight;
 
-                        const offsetInLongitude = convertPixelOffsetToLongitude(map, rotatedXOffsetInPixels);
-                        const offsetInLatitude = convertPixelOffsetToLatitude(map, rotatedYOffsetInPixels);
+                                    lazyImagesLoadedCount++;
 
-                        let moveTo = [this._props.coordinates[0] + offsetInLongitude, this._props.coordinates[1] + offsetInLatitude];
-                        map.update({location: {center: moveTo, easing: 'ease-in-out', duration: 400}});
+                                    if (lazyImagesLoadedCount === lazyImages.length) {
+                                        this.popupFullyLoaded = true;
+                                        this._props.popupToggled(
+                                            this._popupProps.position,
+                                            this._props.coordinates,
+                                            popupOffsetWidth,
+                                            popupOffsetHeight
+                                        );
+                                    }
+                                });
+                            });
+                        }
                     } else {
                         lastMarkerWithOpenedPopup = null;
 
@@ -388,6 +410,28 @@ document.addEventListener('DOMContentLoaded', () => {
                         markerCfg.title = markerData['title'];
                     }
 
+                    // обработчик события загрузки всплывающего окна
+                    markerCfg.popupToggled = (position, coordinates, width, height) => {
+                        let xOffsetInPixels = 0;
+                        let yOffsetInPixels = 0;
+
+                        if (position === 'top') {
+                            yOffsetInPixels = 70 + height / 2;
+                        } else {
+                            xOffsetInPixels = 26 + width / 2;
+                            if (position === 'left') {
+                                xOffsetInPixels *= -1;
+                            }
+                        }
+
+                        const [rotatedXOffsetInPixels, rotatedYOffsetInPixels] = rotatePixelOffsets(xOffsetInPixels, yOffsetInPixels, -map.azimuth);
+
+                        const offsetInLongitude = convertPixelOffsetToLongitude(map, rotatedXOffsetInPixels);
+                        const offsetInLatitude = convertPixelOffsetToLatitude(map, rotatedYOffsetInPixels);
+
+                        let moveTo = [coordinates[0] + offsetInLongitude, coordinates[1] + offsetInLatitude];
+                        map.update({location: {center: moveTo, easing: 'ease-in-out', duration: 400}});
+                    };
                     markers.push(new CustomMarker(markerCfg));
                     if (markerData['show_popup']) {
                         markerWithShowOnLoadPopup = markers[markers.length - 1];
@@ -410,7 +454,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             coordinates: coordinates,
                             onClick: () => {
                                 const bounds = getBounds(features.map(feature => feature.geometry.coordinates));
-                                map.update({location: {bounds: bounds, easing: 'ease-in-out', duration: 250}});
+                                map.update({camera: {azimuth: 0}, location: {bounds: bounds, easing: 'ease-in-out', duration: 250}});
                             }
                         }, cluster(yandexmapProps, features.length).cloneNode(true));
                     }
@@ -452,8 +496,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     const bounds = getBounds(markers.map(val => val.coordinates));
                     bounds[0][1] += convertPixelOffsetToLatitude(map, yandexmapProps['center_offset_y'] || 0);
                     bounds[1][1] += convertPixelOffsetToLatitude(map, yandexmapProps['center_offset_y'] || 0);
-                    bounds[0][0] -= convertPixelOffsetToLongitude(map ,yandexmapProps['center_offset_x'] || 0);
-                    bounds[1][0] -= convertPixelOffsetToLongitude(map ,yandexmapProps['center_offset_x'] || 0);
+                    bounds[0][0] -= convertPixelOffsetToLongitude(map, yandexmapProps['center_offset_x'] || 0);
+                    bounds[1][0] -= convertPixelOffsetToLongitude(map, yandexmapProps['center_offset_x'] || 0);
 
                     if (markers.length === 1) {
                         map.update({location: {center: [bounds[0][0], bounds[0][1]], easing: 'ease-in-out', duration: 400}});
@@ -647,7 +691,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     map.addChild(mapControls[panel].panel);
                 }
             }
-
 
             // Открытие всплывающих окон при загрузке страницы,
             // если указан соответствующий параметр в настройках маркера
