@@ -12,17 +12,15 @@ foreach ($props['metadata'] as $name => $attributes) {
 
 $el = $this->el('div', [
     'class' => [
-        'yandex-map-element',
-        'uk-position-relative',
-        'uk-position-z-index'
+        'yandex-map-element'
     ],
 
     'style' => [
         'width: {width}px;',
-        'height: 300px {@!height} {@!viewport_height}',
-        'height: {height}px {@!viewport_height}',
-        'height: 100vh {@viewport_height: viewport} {@!viewport_height_viewport} {@!viewport_height_offset_top}',
-        'height: {viewport_height_viewport}vh {@viewport_height: viewport} {@!viewport_height_offset_top}'
+        'height: 300px; {@!height} {@!viewport_height}',
+        'height: {height}px; {@!viewport_height}',
+        'height: 100vh; {@viewport_height: viewport} {@!viewport_height_viewport} {@!viewport_height_offset_top}',
+        'height: {viewport_height_viewport}vh; {@viewport_height: viewport} {@!viewport_height_offset_top}'
     ],
 
     'uk-height-viewport' => $props['viewport_height'] === 'viewport' && $props['viewport_height_offset_top'] ? [

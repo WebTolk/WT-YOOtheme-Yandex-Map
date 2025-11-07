@@ -124,6 +124,25 @@
             },
             "enable": "marker_icon"
         },
+        "marker_icon_loading": {
+            "label": "Loading",
+            "description": "By default, images are loaded lazy. Enable eager loading for images in the initial viewport.",
+            "type": "checkbox",
+            "text": "Load image eagerly",
+            "enable": "marker_icon"
+        },
+        "marker_icon_border": {
+            "label": "Border",
+            "description": "Select the image border style.",
+            "type": "select",
+            "options": {
+                "None": "",
+                "Rounded": "rounded",
+                "Circle": "circle",
+                "Pill": "pill"
+            },
+            "enable": "marker_icon"
+        },
         "cluster_icon_1": {
             "label": "Cluster Icon",
             "type": "image"
@@ -165,6 +184,25 @@
                 "placeholder": "auto"
             },
             "enable": "cluster_icon_1"
+        },
+        "cluster_icon_1_loading": {
+            "label": "Loading",
+            "description": "By default, images are loaded lazy. Enable eager loading for images in the initial viewport.",
+            "type": "checkbox",
+            "text": "Load image eagerly",
+            "enable": "marker_icon"
+        },
+        "cluster_icon_1_border": {
+            "label": "Border",
+            "description": "Select the image border style.",
+            "type": "select",
+            "options": {
+                "None": "",
+                "Rounded": "rounded",
+                "Circle": "circle",
+                "Pill": "pill"
+            },
+            "enable": "marker_icon"
         },
         "type": {
             "label": "Type",
@@ -520,23 +558,6 @@
             "description": "Set the maximum width of popup container",
             "attrs": {
                 "placeholder": "px, %, vw, vh, em, rem"
-            }
-        },
-        "popup_padding": {
-            "label": "Padding",
-            "description": "Set padding of popup container",
-            "type": "select",
-            "options": {
-                "None": "",
-                "0": "p-0",
-                "1": "p-1",
-                "2": "p-2",
-                "3": "p-3",
-                "4": "p-4",
-                "5": "p-5",
-                "uk-padding-small": "uk-padding-small",
-                "uk-padding": "uk-padding",
-                "uk-padding-large": "uk-padding-large"
             }
         },
         "title_style": {
@@ -966,6 +987,8 @@
                             "width": "1-2",
                             "fields": ["marker_icon_offset_x", "marker_icon_offset_y"]
                         },
+                        "marker_icon_loading",
+                        "marker_icon_border",
                         "cluster_icon_1",
                         {
                             "name": "_cluster_icon_1_dimensions",
@@ -982,7 +1005,9 @@
                             "type": "grid",
                             "width": "1-2",
                             "fields": ["cluster_icon_1_offset_x", "cluster_icon_1_offset_y"]
-                        }
+                        },
+                        "cluster_icon_1_loading",
+                        "cluster_icon_1_border"
                     ]
                 },
                 {
@@ -1139,7 +1164,7 @@
                             "label": "Popup",
                             "type": "group",
                             "divider": true,
-                            "fields": ["popup_min_width", "popup_max_width", "popup_padding"]
+                            "fields": ["popup_min_width", "popup_max_width"]
                         },
                         {
                             "label": "Title",

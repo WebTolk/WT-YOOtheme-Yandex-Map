@@ -5,7 +5,9 @@
     "width": 500,
     "defaults": {
         "location": "51.533562,46.034266",
-        "popup_position": "top"
+        "popup_position": "top",
+        "popup_padding": "uk-padding",
+        "popup_padding_remove_vertical": true
     },
     "fields": {
         "location": {
@@ -90,6 +92,25 @@
             },
             "enable": "marker_icon"
         },
+        "marker_icon_loading": {
+            "label": "Loading",
+            "description": "By default, images are loaded lazy. Enable eager loading for images in the initial viewport.",
+            "type": "checkbox",
+            "text": "Load image eagerly",
+            "enable": "marker_icon"
+        },
+        "marker_icon_border": {
+            "label": "Border",
+            "description": "Select the image border style.",
+            "type": "select",
+            "options": {
+                "None": "",
+                "Rounded": "rounded",
+                "Circle": "circle",
+                "Pill": "pill"
+            },
+            "enable": "marker_icon"
+        },
         "hide": {
             "label": "Marker",
             "type": "checkbox",
@@ -136,12 +157,6 @@
             "type": "select",
             "options": {
                 "None": "",
-                "0": "p-0",
-                "1": "p-1",
-                "2": "p-2",
-                "3": "p-3",
-                "4": "p-4",
-                "5": "p-5",
                 "uk-padding-small": "uk-padding-small",
                 "uk-padding": "uk-padding",
                 "uk-padding-large": "uk-padding-large"
@@ -203,7 +218,9 @@
                             "type": "grid",
                             "width": "1-2",
                             "fields": ["marker_icon_offset_x", "marker_icon_offset_y"]
-                        }
+                        },
+                        "marker_icon_loading",
+                        "marker_icon_border"
                     ]
                 },
                 {

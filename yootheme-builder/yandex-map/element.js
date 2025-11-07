@@ -191,9 +191,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }
 
-                _image(icon, width, height, offsetX, offsetY) {
+                _image(icon, width, height, offsetX, offsetY, loading, border) {
                     const elem = document.createElement('img');
                     elem.src = processSrc(icon);
+                    elem.loading = loading ? 'eager' : 'lazy';
+                    if (border) {
+                        elem.classList.add('uk-border-' + border);
+                    }
                     if (width) {
                         elem.style.width = width + 'px';
                         elem.style.maxWidth = 'unset';
@@ -224,7 +228,9 @@ document.addEventListener('DOMContentLoaded', () => {
                             this._props.markerProps['marker_icon_width'] || this._props.props['marker_icon_width'],
                             this._props.markerProps['marker_icon_height'] || this._props.props['marker_icon_height'],
                             this._props.markerProps['marker_icon_offset_x'] || this._props.props['marker_icon_offset_x'],
-                            this._props.markerProps['marker_icon_offset_y'] || this._props.props['marker_icon_offset_y']
+                            this._props.markerProps['marker_icon_offset_y'] || this._props.props['marker_icon_offset_y'],
+                            this._props.markerProps['marker_icon_loading'] || this._props.props['marker_icon_loading'],
+                            this._props.markerProps['marker_icon_border'] || this._props.props['marker_icon_border']
                         ));
                     } else {
                         e(o, "icon-box").innerHTML = '<svg viewBox="0 0 60 68" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><defs><path d="M23.51 51.523a.5.5 0 0 1-.5.477c-.29 0-.51-.21-.52-.477-.145-3.168-1.756-5.217-4.832-6.147C7.53 42.968 0 33.863 0 23 0 10.297 10.297 0 23 0s23 10.297 23 23c0 10.863-7.53 19.968-17.658 22.376-3.076.93-4.687 2.98-4.83 6.147z" id="&-id-svg-filter"></path><filter x="-21.7%" y="-15.4%" width="143.5%" height="138.5%" filterUnits="objectBoundingBox" id="&-svg-filter"><feGaussianBlur in="SourceGraphic" stdDeviation="3"></feGaussianBlur><feComponentTransfer><feFuncA type="linear" slope=".3"></feFuncA></feComponentTransfer></filter></defs><g fill="none" fill-rule="evenodd"><g fill-rule="nonzero" transform="translate(7 5)" fill="currentColor"><use filter="url(#&-svg-filter)" xlink:href="#&-id-svg-filter"></use><use xlink:href="#&-id-svg-filter"></use></g><path d="M30 68c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z" fill="#fff" fill-rule="nonzero"></path><path d="M30 66a2 2 0 1 0 .001-3.999A2 2 0 0 0 30 66z" fill="currentColor"></path></g></svg>';
@@ -808,10 +814,16 @@ function cluster(yandexmapProps, count) {
         const height = yandexmapProps['cluster_icon_1_height'];
         const offsetX = yandexmapProps['cluster_icon_1_offset_x'];
         const offsetY = yandexmapProps['cluster_icon_1_offset_y'];
+        const loading = yandexmapProps['cluster_icon_1_loading'];
+        const border = yandexmapProps['cluster_icon_1_border'];
 
         const iconWithImage = document.createElement('img');
         iconWithImage.classList.add('cluster-icon-image');
         iconWithImage.src = processSrc(icon);
+        iconWithImage.loading = loading ? 'eager' : 'lazy';
+        if (border) {
+            iconWithImage.classList.add('uk-border-' + border);
+        }
         if (width) {
             iconWithImage.style.width = width + 'px';
         }
