@@ -13,7 +13,6 @@
     <namespace path="src">Joomla\Plugin\System\WtYoothemeYandexMap</namespace>
     <files>
         <folder plugin="wtyoothemeyandexmap">src</folder>
-        <folder>language</folder>
         <folder>services</folder>
         <folder>yootheme-builder</folder>
     </files>
