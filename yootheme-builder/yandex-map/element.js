@@ -6,6 +6,7 @@ import {loadYandexApi} from './api.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     (function(w, a) {
+        const YANDEX_ELEMENT_TAG = 'ymaps3';
         const CLUSTER_ANIMATION = {
             easing: 'ease-in-out',
             duration: 250
@@ -34,6 +35,125 @@ document.addEventListener('DOMContentLoaded', () => {
                         'YMapGeolocationControl'
                     ]
                 }
+            });
+        }
+
+        function buildMarkerPopupContent(yandexmapProps, markerData) {
+            let contentHTML = '';
+
+            contentHTML += utilsModule.popupImage(yandexmapProps, markerData);
+            contentHTML += utilsModule.popupElem('title', yandexmapProps, markerData['title']);
+            contentHTML += utilsModule.popupElem('meta', yandexmapProps, markerData['meta']);
+            contentHTML += utilsModule.popupElem('content', yandexmapProps, markerData['content'], false);
+            contentHTML += utilsModule.popupLink(yandexmapProps, markerData);
+
+            return contentHTML;
+        }
+
+        function createPopupToggledHandler(map, cfg) {
+            return (position, coordinates, width, height) => {
+                let xOffsetInPixels = 0;
+                let yOffsetInPixels = 0;
+
+                if (position === 'top') {
+                    yOffsetInPixels = 68 + height / 2;
+                } else {
+                    xOffsetInPixels = 23 + width / 2;
+                    if (position === 'left') {
+                        xOffsetInPixels *= -1;
+                    }
+                }
+
+                const [rotatedXOffsetInPixels, rotatedYOffsetInPixels] = utilsModule.rotatePixelOffsets(xOffsetInPixels, yOffsetInPixels, -map.azimuth);
+
+                const offsetInLongitude = utilsModule.convertPixelOffsetToLongitude(map, rotatedXOffsetInPixels, cfg.margin);
+                const offsetInLatitude = utilsModule.convertPixelOffsetToLatitude(map, rotatedYOffsetInPixels, cfg.margin);
+
+                let moveTo = [coordinates[0] + offsetInLongitude, coordinates[1] + offsetInLatitude];
+                map.update({location: {center: moveTo, ...MARKER_ANIMATION}});
+            };
+        }
+
+        function createMarkerConfig(map, cfg, yandexmapProps, markerData) {
+            const parsedCoordinates = utilsModule.parseCoordinates(markerData['location']);
+
+            if (!parsedCoordinates) {
+                return null;
+            }
+
+            const [lat, lng] = parsedCoordinates;
+
+            const markerCfg = {
+                coordinates: [lng, lat],
+                props: yandexmapProps,
+                markerProps: markerData
+            };
+
+            if (!markerData['hide_popup']) {
+                markerCfg.popup = {
+                    content: buildMarkerPopupContent(yandexmapProps, markerData),
+                    position: markerData['popup_position']
+                };
+            }
+
+            if (yandexmapProps['show_title'] && markerData['title']) {
+                markerCfg.title = markerData['title'];
+            }
+
+            markerCfg.popupToggled = createPopupToggledHandler(map, cfg);
+
+            return markerCfg;
+        }
+
+        function applyInitialCentering(map, cfg, yandexmapProps, markers) {
+            if (yandexmapProps['centering_mode'] === 'onLastMarker' && markers.length > 0) {
+                const [lastMarkerLng, lastMarkerLat] = markers[markers.length - 1].coordinates;
+                map.update({location: {center: [lastMarkerLng, lastMarkerLat], ...MARKER_ANIMATION}});
+            }
+
+            if (yandexmapProps['centering_mode'] === 'fitAllMarkers') {
+                const bounds = utilsModule.getBounds(markers.map(val => val.coordinates));
+                bounds[0][1] += utilsModule.convertPixelOffsetToLatitude(map, yandexmapProps['center_offset_y'] || 0, cfg.margin);
+                bounds[1][1] += utilsModule.convertPixelOffsetToLatitude(map, yandexmapProps['center_offset_y'] || 0, cfg.margin);
+                bounds[0][0] -= utilsModule.convertPixelOffsetToLongitude(map, yandexmapProps['center_offset_x'] || 0, cfg.margin);
+                bounds[1][0] -= utilsModule.convertPixelOffsetToLongitude(map, yandexmapProps['center_offset_x'] || 0, cfg.margin);
+
+                if (markers.length === 1) {
+                    map.update({location: {center: [bounds[0][0], bounds[0][1]], ...MARKER_ANIMATION}});
+                } else if (markers.length > 1) {
+                    map.update({location: {bounds: bounds, ...MARKER_ANIMATION}});
+                }
+            }
+        }
+
+        function createFullscreenControl(elementTag, ymaps3, map) {
+            const fullScreenBtn = document.createElement('div');
+            fullScreenBtn.classList.add(`${elementTag}--control-fullscreen`);
+            fullScreenBtn.innerHTML = `
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <g clip-path="url(#clip0_1470_10318)" transform="matrix(0.938241, 0, 0, 0.938102, -1.285652, -1.081787)">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M23.752 4.59473C23.7619 4.45662 23.6471 4.3418 23.5089 4.35171L18.4336 4.71611C18.1746 4.7347 18.0574 5.04912 18.241 5.23274L19.7842 6.776L14.771 11.7892L16.3141 13.3323L21.3273 8.31911L22.8709 9.86269C23.0545 10.0463 23.369 9.92909 23.3876 9.67008L23.752 4.59473Z" fill="currentColor"/>
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M4.56835 23.2952C4.55844 23.4333 4.67326 23.5481 4.81137 23.5382L9.88672 23.1738C10.1457 23.1552 10.263 22.8408 10.0793 22.6571L8.53608 21.1139L13.5493 16.1007L12.0062 14.5576L6.99297 19.5708L5.44938 18.0272C5.26577 17.8436 4.95134 17.9608 4.93275 18.2198L4.56835 23.2952Z" fill="currentColor"/>
+                  </g>
+                  <defs>
+                    <clipPath id="clip0_1470_10318">
+                      <rect width="24" height="24" fill="white"/>
+                    </clipPath>
+                  </defs>
+                </svg>
+            `;
+
+            return new ymaps3.YMapControlButton({
+                onClick: () => {
+                    if (document.fullscreenElement) {
+                        document.exitFullscreen();
+                        fullScreenBtn.classList.remove('ymaps-control-active');
+                    } else {
+                        map.container.parentNode.requestFullscreen();
+                        fullScreenBtn.classList.add('ymaps-control-active');
+                    }
+                },
+                element: fullScreenBtn
             });
         }
 
@@ -92,7 +212,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // список маркеров с открытыми всплывающими окнами
             let activeMarkers = new Set();
-            const YANDEX_ELEMENT_TAG = "ymaps3";
             const CustomMarker = createCustomMarker(ymaps3.YMapDefaultMarker, {
                 getMap: () => map,
                 getActiveMarkers: () => activeMarkers,
@@ -106,56 +225,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 const markers = [];
 
                 for (const markerData of yandexmapProps['markers']) {
-                    let contentHTML = '';
-                    contentHTML += utilsModule.popupImage(yandexmapProps, markerData);
-                    contentHTML += utilsModule.popupElem('title', yandexmapProps, markerData['title']);
-                    contentHTML += utilsModule.popupElem('meta', yandexmapProps, markerData['meta']);
-                    contentHTML += utilsModule.popupElem('content', yandexmapProps, markerData['content'], false);
-                    contentHTML += utilsModule.popupLink(yandexmapProps, markerData);
+                    const markerCfg = createMarkerConfig(map, cfg, yandexmapProps, markerData);
 
-                    const parsedCoordinates = utilsModule.parseCoordinates(markerData['location']);
-                    if (!parsedCoordinates) {
+                    if (!markerCfg) {
                         continue;
                     }
-                    const [lat, lng] = parsedCoordinates;
 
-                    const markerCfg = {
-                        coordinates: [lng, lat],
-                        props: yandexmapProps,
-                        markerProps: markerData
-                    };
-                    if (!markerData['hide_popup']) {
-                        markerCfg.popup = {
-                            content: contentHTML,
-                            position: markerData['popup_position']
-                        };
-                    }
-                    if (yandexmapProps['show_title'] && markerData['title']) {
-                        markerCfg.title = markerData['title'];
-                    }
-
-                    // обработчик события загрузки всплывающего окна
-                    markerCfg.popupToggled = (position, coordinates, width, height) => {
-                        let xOffsetInPixels = 0;
-                        let yOffsetInPixels = 0;
-
-                        if (position === 'top') {
-                            yOffsetInPixels = 68 + height / 2;
-                        } else {
-                            xOffsetInPixels = 23 + width / 2;
-                            if (position === 'left') {
-                                xOffsetInPixels *= -1;
-                            }
-                        }
-
-                        const [rotatedXOffsetInPixels, rotatedYOffsetInPixels] = utilsModule.rotatePixelOffsets(xOffsetInPixels, yOffsetInPixels, -map.azimuth);
-
-                        const offsetInLongitude = utilsModule.convertPixelOffsetToLongitude(map, rotatedXOffsetInPixels, cfg.margin);
-                        const offsetInLatitude = utilsModule.convertPixelOffsetToLatitude(map, rotatedYOffsetInPixels, cfg.margin);
-
-                        let moveTo = [coordinates[0] + offsetInLongitude, coordinates[1] + offsetInLatitude];
-                        map.update({location: {center: moveTo, ...MARKER_ANIMATION}});
-                    };
                     markers.push(new CustomMarker(markerCfg));
                     if (markerData['show_popup']) {
                         markersWithShowOnLoadPopup.push(markers[markers.length - 1]);
@@ -235,25 +310,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }));
 
-                // перемещаем карту к последнему добавленному маркеру
-                if (yandexmapProps['centering_mode'] === 'onLastMarker' && markers.length > 0) {
-                    const [lastMarkerLng, lastMarkerLat] = markers[markers.length - 1].coordinates;
-                    map.update({location: {center: [lastMarkerLng, lastMarkerLat], ...MARKER_ANIMATION}});
-                }
-                // центрируем карту так, чтобы вместить все установленные маркеры
-                if (yandexmapProps['centering_mode'] === 'fitAllMarkers') {
-                    const bounds = utilsModule.getBounds(markers.map(val => val.coordinates));
-                    bounds[0][1] += utilsModule.convertPixelOffsetToLatitude(map, yandexmapProps['center_offset_y'] || 0, cfg.margin);
-                    bounds[1][1] += utilsModule.convertPixelOffsetToLatitude(map, yandexmapProps['center_offset_y'] || 0, cfg.margin);
-                    bounds[0][0] -= utilsModule.convertPixelOffsetToLongitude(map, yandexmapProps['center_offset_x'] || 0, cfg.margin);
-                    bounds[1][0] -= utilsModule.convertPixelOffsetToLongitude(map, yandexmapProps['center_offset_x'] || 0, cfg.margin);
-
-                    if (markers.length === 1) {
-                        map.update({location: {center: [bounds[0][0], bounds[0][1]], ...MARKER_ANIMATION}});
-                    } else if (markers.length > 1) {
-                        map.update({location: {bounds: bounds, ...MARKER_ANIMATION}});
-                    }
-                }
+                applyInitialCentering(map, cfg, yandexmapProps, markers);
             }
 
             const mapControls = {
@@ -267,6 +324,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 'bottomRight': {list: [], panel: new ymaps3.YMapControls({position: 'bottom right'})}
             };
 
+            // добавить вместо объекта element фабрику создания объекта, чтобы создавать объект только при реальном добавлении в список контролов
             function addMapControl(propName, element) {
                 if (!yandexmapProps[propName]) {
                     return;
@@ -280,33 +338,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             addMapControl('show_zoom_controls', new ymaps3.YMapZoomControl());
 
-            const fullScreenBtn = document.createElement('div');
-            fullScreenBtn.classList.add(`${YANDEX_ELEMENT_TAG}--control-fullscreen`);
-            fullScreenBtn.innerHTML = `
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <g clip-path="url(#clip0_1470_10318)" transform="matrix(0.938241, 0, 0, 0.938102, -1.285652, -1.081787)">
-                    <path fill-rule="evenodd" clip-rule="evenodd" d="M23.752 4.59473C23.7619 4.45662 23.6471 4.3418 23.5089 4.35171L18.4336 4.71611C18.1746 4.7347 18.0574 5.04912 18.241 5.23274L19.7842 6.776L14.771 11.7892L16.3141 13.3323L21.3273 8.31911L22.8709 9.86269C23.0545 10.0463 23.369 9.92909 23.3876 9.67008L23.752 4.59473Z" fill="currentColor"/>
-                    <path fill-rule="evenodd" clip-rule="evenodd" d="M4.56835 23.2952C4.55844 23.4333 4.67326 23.5481 4.81137 23.5382L9.88672 23.1738C10.1457 23.1552 10.263 22.8408 10.0793 22.6571L8.53608 21.1139L13.5493 16.1007L12.0062 14.5576L6.99297 19.5708L5.44938 18.0272C5.26577 17.8436 4.95134 17.9608 4.93275 18.2198L4.56835 23.2952Z" fill="currentColor"/>
-                  </g>
-                  <defs>
-                    <clipPath id="clip0_1470_10318">
-                      <rect width="24" height="24" fill="white"/>
-                    </clipPath>
-                  </defs>
-                </svg>
-            `;
-            addMapControl('show_fullscreen_control', new ymaps3.YMapControlButton({
-                onClick: () => {
-                    if (document.fullscreenElement) {
-                        document.exitFullscreen();
-                        fullScreenBtn.classList.remove('ymaps-control-active');
-                    } else {
-                        map.container.parentNode.requestFullscreen();
-                        fullScreenBtn.classList.add('ymaps-control-active');
-                    }
-                },
-                element: fullScreenBtn
-            }));
+            addMapControl('show_fullscreen_control', createFullscreenControl(YANDEX_ELEMENT_TAG, ymaps3, map));
 
             controlsModule.addRulerControl({
                 ymaps3,

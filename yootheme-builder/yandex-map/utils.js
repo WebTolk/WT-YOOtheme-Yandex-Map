@@ -16,17 +16,6 @@ export function getMapElement(container, elementClass) {
         || null;
 }
 
-export function processSrc(value) {
-    let srcAttr = '';
-
-    if (value && !value.startsWith('/') && !value.startsWith('http://') && !value.startsWith('https://')) {
-        srcAttr = '/';
-    }
-
-    srcAttr += value;
-    return srcAttr;
-}
-
 export function parseCoordinates(value) {
     if (typeof value !== 'string' || !value.trim()) {
         return null;
@@ -218,7 +207,18 @@ export function popupElem(type, props, value, isTextContent = true) {
     return elem.outerHTML;
 }
 
-export function setTopMargin(elem, margin) {
+export function processSrc(value) {
+    let srcAttr = '';
+
+    if (value && !value.startsWith('/') && !value.startsWith('http://') && !value.startsWith('https://')) {
+        srcAttr = '/';
+    }
+
+    srcAttr += value;
+    return srcAttr;
+}
+
+function setTopMargin(elem, margin) {
     let className = 'uk-margin-';
     if (margin) {
         className += margin + '-';
@@ -227,7 +227,7 @@ export function setTopMargin(elem, margin) {
     elem.classList.add(className);
 }
 
-export function addOptionalClass(elem, prefix, value) {
+function addOptionalClass(elem, prefix, value) {
     if (value) {
         elem.classList.add(prefix + value);
     }
