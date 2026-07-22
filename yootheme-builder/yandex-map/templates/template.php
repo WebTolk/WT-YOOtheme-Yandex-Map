@@ -1,5 +1,6 @@
 <?php
 
+use Joomla\CMS\Language\Text;
 use YOOtheme\Metadata;
 use function YOOtheme\app;
 
@@ -36,6 +37,11 @@ foreach ($props as $key => $value) {
 }
 
 $script = $this->el('script', ['type' => 'application/json'], json_encode($options));
+
+Text::script('PLG_WTYOOTHEMEYANDEXMAP_ERROR_API_KEY_NEEDED');
+Text::script('PLG_WTYOOTHEMEYANDEXMAP_RULER_FINISH');
+Text::script('PLG_WTYOOTHEMEYANDEXMAP_RULER_FINISH_TOOLTIP');
+Text::script('PLG_WTYOOTHEMEYANDEXMAP_RULER_DELETE_ALL_TOOLTIP');
 
 ?>
 <?= $el($props, $attrs); ?>

@@ -215,7 +215,7 @@
         },
         "zoom": {
             "label": "Zoom",
-            "description": "Set the initial resolution at which to display the map. 0 is fully zoomed out and 18 is at the highest resolution zoomed in.",
+            "description": "Set the initial resolution at which to display the map. 0 is fully zoomed out and 21 is at the highest resolution zoomed in.",
             "type": "range",
             "attrs": {
                 "min": 0,
@@ -1206,7 +1206,7 @@
                             "fields": [
                                 {
                                     "label": "Width/Height",
-                                    "description": "Setting just one value preserves the original proportions. The image will be resized and cropped automatically, and where possible, high resolution images will be auto-generated.",
+                                    "description": "Setting just one value preserves the original proportions. The image will be resized and cropped automatically, and where possible, high resolution images will be auto-generated",
                                     "type": "grid",
                                     "width": "1-2",
                                     "fields": ["image_width", "image_height"]

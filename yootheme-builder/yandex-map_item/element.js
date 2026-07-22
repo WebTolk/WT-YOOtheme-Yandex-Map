@@ -1,23 +1,35 @@
+import {loadYandexApi} from '../yandex-map/api.js';
+import {parseCoordinates} from '../yandex-map/utils.js';
+
 document.addEventListener('DOMContentLoaded', () => {
     (function(w, a) {
-        "use strict";
+        const DEFAULT_COORDINATES = [0, 0];
+
+        async function getYandexApi() {
+            return loadYandexApi({
+                cdn: [
+                    '@yandex/ymaps3-default-ui-theme@0.0.24'
+                ],
+                imports: {
+                    '@yandex/ymaps3-markers@0.0.1': ['YMapDefaultMarker'],
+                    '@yandex/ymaps3-default-ui-theme': ['YMapZoomControl']
+                }
+            });
+        }
+
         async function build(elem, inputEl) {
-            try {
-                await ymaps3.ready;
-            } catch (e) {
-                console.log(e);
-                console.log('WT YOOtheme Yandex Map: Ошибка при загрузке API Яндекс Карт. Пожалуйста, укажите верный ключ API в настройках плагина!');
+            const ymaps3 = await getYandexApi();
+
+            if (!ymaps3) {
                 return;
             }
 
-            const {YMapZoomControl} = await ymaps3.import('@yandex/ymaps3-controls@0.0.1');
-            const {YMapDefaultMarker} = await ymaps3.import('@yandex/ymaps3-markers@0.0.1');
-
-            const [lat, lng] = inputEl.value.split(',');
+            const initialCoordinates = parseCoordinates(inputEl.value) || DEFAULT_COORDINATES;
+            const [initialLat, initialLng] = initialCoordinates;
 
             const map = new ymaps3.YMap(elem, {
                 location: {
-                    center: [parseFloat(lng), parseFloat(lat)],
+                    center: [initialLng, initialLat],
                     zoom: 9
                 },
                 showScaleInCopyrights: true
@@ -25,25 +37,25 @@ document.addEventListener('DOMContentLoaded', () => {
             map.addChild(new ymaps3.YMapDefaultSchemeLayer());
             map.addChild(new ymaps3.YMapDefaultFeaturesLayer());
             map.addChild(new ymaps3.YMapControls({position: 'right'})
-                .addChild(new YMapZoomControl())
+                .addChild(new ymaps3.YMapZoomControl())
             );
 
-            const draggableMarker = new YMapDefaultMarker({
-                coordinates: [parseFloat(lng), parseFloat(lat)],
+            const draggableMarker = new ymaps3.YMapDefaultMarker({
+                coordinates: [initialLng, initialLat],
                 draggable: true,
                 mapFollowsOnDrag: true,
                 onDragStart: (a, b) => {
                     setMarkerCursor(draggableMarker, 'grabbing');
                 },
-                onDragEnd: (crds) => {
+                onDragEnd: (coords) => {
                     setMarkerCursor(draggableMarker, 'grab');
 
-                    const lat = crds[1].toFixed(6);
-                    const lng = crds[0].toFixed(6);
+                    const lat = coords[1].toFixed(6);
+                    const lng = coords[0].toFixed(6);
 
                     map.update({location: {center: [lng, lat], duration: 400}});
                     inputEl.value = lat + ',' + lng;
-                    inputEl.dispatchEvent(new Event('input'));
+                    inputEl.dispatchEvent(new Event('input', {bubbles: true}));
                 }
             });
 
@@ -60,21 +72,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     map.update({location: {center: [lng, lat], duration: 400}});
                     inputEl.value = lat + ',' + lng;
-                    inputEl.dispatchEvent(new Event('input'));
+                    inputEl.dispatchEvent(new Event('input', {bubbles: true}));
                 },
             }));
             inputEl.onchange = (ev) => {
-                let [new_lat, new_lng] = ev.target.value.split(',');
-                if (isNaN(new_lat) || isNaN(new_lng)) {
+                const newCoordinates = parseCoordinates(ev.target.value);
+                if (!newCoordinates) {
                     return;
                 }
-                new_lat = parseFloat(new_lat).toFixed(6);
-                new_lng = parseFloat(new_lng).toFixed(6);
+                const [normalizedLat, normalizedLng] = newCoordinates;
 
-                draggableMarker.update({coordinates: [new_lng, new_lat]});
+                draggableMarker.update({coordinates: [normalizedLng, normalizedLat]});
                 setMarkerCursor(draggableMarker, 'grab');
 
-                map.update({location: {center: [new_lng, new_lat], duration: 400}});
+                map.update({location: {center: [normalizedLng, normalizedLat], duration: 400}});
             };
         }
 

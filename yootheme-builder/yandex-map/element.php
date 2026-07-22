@@ -32,7 +32,9 @@ return [
             ];
             // Собственный скрипт элемента
             $node->props['metadata']['script:plg.system.wtyoothemeyandexmap_element'] = [
-                'src' => 'plugins/system/wtyoothemeyandexmap/yootheme-builder/yandex-map/element.js'
+                'src' => 'plugins/system/wtyoothemeyandexmap/yootheme-builder/yandex-map/element.js',
+                'type' => 'module',
+                'defer' => true
             ];
             // Стиль элемента
             $node->props['metadata']['style:plg.system.wtyoothemeyandexmap_popup_style'] = [

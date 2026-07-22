@@ -1,4 +1,4 @@
-.ymaps3x0--default-marker__title-wrapper
+.ymaps3--default-marker__title-wrapper
 {
     max-width: 256px !important;
 }
@@ -8,27 +8,27 @@
     overflow: auto;
 }
 
-ymaps.ymaps3x0--default-marker__popup
+.ymaps3--default-marker__popup
 {
     flex-direction: column-reverse;
-    padding: 0;
-    gap: 4px;
+    padding: 0 !important;
+    gap: 4px !important;
     z-index: 1;
 }
 
-.ymaps3x0--default-marker__popup_left
+.ymaps3--default-marker__popup_left
 {
     position: absolute !important;
     transform: translate(calc(-100% - 26px), calc(-50%)) !important;
 }
 
-.ymaps3x0--default-marker__popup_right
+.ymaps3--default-marker__popup_right
 {
     position: absolute !important;
     transform: translate(26px, calc(-50%)) !important;
 }
 
-ymaps.ymaps3x0--default-marker__popup-container
+.ymaps3--default-marker__popup-container
 {
     box-sizing: border-box;
     max-width: 100%;
@@ -36,7 +36,7 @@ ymaps.ymaps3x0--default-marker__popup-container
     text-wrap: wrap;
 }
 
-.ymaps3x0--default-marker__popup button[uk-close]
+.ymaps3--default-marker__popup button[uk-close]
 {
     position: relative;
     top: 0;
@@ -45,22 +45,22 @@ ymaps.ymaps3x0--default-marker__popup-container
     padding: 0.75rem;
 }
 
-.ymaps3x0--default-marker__popup button[uk-close]:focus
+.ymaps3--default-marker__popup button[uk-close]:focus
 {
     box-shadow: none;
 }
 
-ymaps.ymaps3x0--marker:has(> ymaps > ymaps.ymaps3x0--default-marker__popup:not(.ymaps3x0--default-marker__hider))
+ymaps3.ymaps3--marker:has(> ymaps3 > ymaps3.ymaps3--default-marker__popup:not(.ymaps3--default-marker__hider))
 {
     z-index: 1 !important;
 }
 
-:is(.ymaps3x0--control-fullscreen, .ymaps3x0--control-ruler)
+:is(.ymaps3--control-fullscreen, .ymaps3--control-ruler)
 {
     color: #4D4D4D;
 }
 
-button.ymaps3x0--control-button:hover > :is(.ymaps3x0--control-fullscreen, .ymaps3x0--control-ruler)
+button.ymaps3--control-button:hover > :is(.ymaps3--control-fullscreen, .ymaps3--control-ruler)
 {
     color: #000;
 }
@@ -70,7 +70,7 @@ button.ymaps3x0--control-button:hover > :is(.ymaps3x0--control-fullscreen, .ymap
     color: #0d6efd !important;
 }
 
-ymaps.ymaps3x0--marker .cluster
+.ymaps3--marker .cluster
 {
     position: relative;
     transform: translate(-50%, -50%);
@@ -80,7 +80,7 @@ ymaps.ymaps3x0--marker .cluster
     cursor: pointer;
 }
 
-ymaps.ymaps3x0--marker .cluster > .cluster-icon
+.ymaps3--marker .cluster > .cluster-icon
 {
     width: 3rem;
     height: 3rem;
@@ -88,13 +88,13 @@ ymaps.ymaps3x0--marker .cluster > .cluster-icon
     border-radius: 50%;
 }
 
-ymaps.ymaps3x0--marker .cluster > .cluster-icon-image
+.ymaps3--marker .cluster > .cluster-icon-image
 {
     cursor: pointer;
     max-width: unset;
 }
 
-ymaps.ymaps3x0--marker .cluster > .cluster-text
+.ymaps3--marker .cluster > .cluster-text
 {
     position: absolute;
     color: white;
@@ -122,11 +122,11 @@ ymaps.ymaps3x0--marker .cluster > .cluster-text
 }
 
 /* Для корректного отображения модуля "Линейка" YMapRuler */
-ymaps.ymaps3x0--map-container svg
+.ymaps3--map-container svg
 {
     max-width: unset;
 }
 
-.ymaps3x0--map {
+.ymaps3--map {
     touch-action: pan-y !important;
 }

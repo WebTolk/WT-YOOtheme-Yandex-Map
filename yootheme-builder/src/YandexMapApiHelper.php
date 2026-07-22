@@ -32,18 +32,16 @@ class YandexMapApiHelper
             $entrypoint = $yandex_map_api_entry_point_paid;
         }
 
-        $api_key = $params->yandex_map_api_key;
+        $api_key = $params->yandex_map_api_key ?? '';
 
         $app = Factory::getApplication();
-        $language = $app->getLanguage();
 
         if (empty($api_key)) {
-            $language->load('plg_system_wtyoothemeyandexmap', JPATH_ADMINISTRATOR);
             $app->enqueueMessage($plugin->name . ': ' . Text::_('PLG_WTYOOTHEMEYANDEXMAP_ERROR_API_KEY_NEEDED'), 'error');
             return false;
         }
 
-        $language_tag = str_replace('-', '_', $language->getTag());
+        $language_tag = str_replace('-', '_', $app->getLanguage()->getTag());
 
         return "{$entrypoint}/?apikey={$api_key}&lang={$language_tag}";
     }

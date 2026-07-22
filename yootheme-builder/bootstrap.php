@@ -9,8 +9,12 @@
  */
 
 use YOOtheme\Builder;
+use YOOtheme\Config;
+use YOOtheme\Container;
 use YOOtheme\Path;
+use YOOtheme\Translator;
 
+include_once __DIR__ . '/src/LocalizationListener.php';
 include_once __DIR__ . '/src/CustomizerListener.php';
 include_once __DIR__ . '/src/YandexMapApiHelper.php';
 
@@ -19,8 +23,13 @@ defined('_JEXEC') or die;
 
 return [
     'extend' => [
-        Builder::class => function (Builder $builder) {
+        Builder::class => function (Builder $builder, Container $container) {
             $builder->addTypePath(Path::get('./*/element.json'));
+            LocalizationListener::localizeBuilderTypes(
+                $builder,
+                $container->get(Config::class),
+                $container->get(Translator::class)
+            );
         }
     ],
     'events' => [

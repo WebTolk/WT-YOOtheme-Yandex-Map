@@ -19,6 +19,7 @@ defined('_JEXEC') or die;
 
 class WtYoothemeYandexMap extends CMSPlugin implements SubscriberInterface
 {
+    protected $autoloadLanguage = true;
     protected $allowLegacyListeners = false;
 
     /**

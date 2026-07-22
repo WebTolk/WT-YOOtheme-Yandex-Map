@@ -28,7 +28,11 @@ class CustomizerListener
         $metadata = app(Metadata::class);
         $metadata->set(
             'script:plg.system.wtyoothemeyandexmap_map_item',
-            ['src' => 'plugins/system/wtyoothemeyandexmap/yootheme-builder/yandex-map_item/element.js']
+            [
+                'src' => 'plugins/system/wtyoothemeyandexmap/yootheme-builder/yandex-map_item/element.js',
+                'type' => 'module',
+                'defer' => true,
+            ]
         );
 
         $yandexmap_api = YandexMapApiHelper::getYandexMapApi();
