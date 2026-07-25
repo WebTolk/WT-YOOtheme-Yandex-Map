@@ -1,16 +1,14 @@
 /**
  * @param ymaps3 - namespace Yandex Maps API v3
  * @param getMap - функция-геттер экземпляра карты
- * @param getYandexmapProps - функция-геттер настроек элемента карты
- * @param getMapControls - функция-геттер реестра контролов карты
- * @param getYandexElementTag - функция-геттер CSS-префикса yandex-элемента
+ * @param getActivePanel - функция-геттер активной панели контролов, в которую во время работы линейки добавляются кнопки выбора режима
+ * @param YANDEX_ELEMENT_TAG - CSS-префикс yandex-элемента
  */
 export function addRulerControl({
     ymaps3,
     getMap,
-    getYandexmapProps,
-    getMapControls,
-    getYandexElementTag = () => 'ymaps3'
+    getActivePanel,
+    YANDEX_ELEMENT_TAG = 'ymaps3'
 }) {
     const localizeRulerActionButtons = root => {
         root?.querySelectorAll('.ymaps3--default-ruler-point_actions').forEach(actions => {
@@ -29,8 +27,6 @@ export function addRulerControl({
         });
     };
 
-    const yandexmapProps = getYandexmapProps();
-    const mapControls = getMapControls();
     let rulerLocalizationFrameId = null;
 
     const stopRulerActionsLocalization = () => {
@@ -47,6 +43,14 @@ export function addRulerControl({
             localizeRulerActionButtons(container);
         });
     };
+
+    function handleRulerMapClick() {
+        if (!rulerActive) {
+            return;
+        }
+
+        scheduleRulerActionsLocalization(getMap().container);
+    }
 
     // МОДУЛЬ ЛИНЕЙКИ СТАРТ
     const rulerComponent = new ymaps3.YMapDefaultRuler({
@@ -80,73 +84,62 @@ export function addRulerControl({
     });
 
     let rulerActive = false;
-    if (yandexmapProps['show_ruler_control']) {
-        const panel = yandexmapProps['show_ruler_control_panel'];
-        const order = yandexmapProps['show_ruler_control_order'];
 
-        const rulerIcon = document.createElement('div');
-        rulerIcon.classList.add(`${getYandexElementTag()}--control-ruler`);
-        rulerIcon.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3.56 14.363L14.363 3.56a1.91 1.91 0 0 1 2.7 0l3.377 3.376a1.91 1.91 0 0 1 0 2.7L9.636 20.442a1.91 1.91 0 0 1-2.7 0l-3.377-3.377a1.91 1.91 0 0 1 0-2.7zm4.12-.743l1.282-1.282 1.823 1.824a.764.764 0 1 0 1.08-1.082l-1.824-1.822 1.216-1.215 1.148 1.145a.763.763 0 0 0 1.318-.534.765.765 0 0 0-.237-.545l-1.148-1.147 1.282-1.283 1.824 1.824a.764.764 0 0 0 1.08-1.082l-1.825-1.824 1.014-1.012a.478.478 0 1 0-.676-.675L4.91 15.038a.478.478 0 0 0 .675.675l1.012-1.012 1.15 1.146a.764.764 0 1 0 1.08-1.079L7.679 13.62v.001z" fill="currentColor"></path></svg>';
-        mapControls[panel].list.push({value: new ymaps3.YMapControlButton({
-            onClick: () => {
-                const map = getMap();
-                rulerIcon.classList.toggle('ymaps-control-active');
+    const rulerIcon = document.createElement('div');
+    rulerIcon.classList.add(`${YANDEX_ELEMENT_TAG}--control-ruler`);
+    rulerIcon.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3.56 14.363L14.363 3.56a1.91 1.91 0 0 1 2.7 0l3.377 3.376a1.91 1.91 0 0 1 0 2.7L9.636 20.442a1.91 1.91 0 0 1-2.7 0l-3.377-3.377a1.91 1.91 0 0 1 0-2.7zm4.12-.743l1.282-1.282 1.823 1.824a.764.764 0 1 0 1.08-1.082l-1.824-1.822 1.216-1.215 1.148 1.145a.763.763 0 0 0 1.318-.534.765.765 0 0 0-.237-.545l-1.148-1.147 1.282-1.283 1.824 1.824a.764.764 0 0 0 1.08-1.082l-1.825-1.824 1.014-1.012a.478.478 0 1 0-.676-.675L4.91 15.038a.478.478 0 0 0 .675.675l1.012-1.012 1.15 1.146a.764.764 0 1 0 1.08-1.079L7.679 13.62v.001z" fill="currentColor"></path></svg>';
 
-                if (!rulerActive) {
-                    rulerComponent.update({type: 'ruler', editable: true});
-                    map.addChild(rulerComponent);
-                    map.container.addEventListener('click', handleRulerMapClick, true);
+    const rulerControl = new ymaps3.YMapControlButton({
+        onClick: () => {
+            const map = getMap();
+            const activePanel = getActivePanel();
+            rulerIcon.classList.toggle('ymaps-control-active');
 
-                    rulerModeElem.classList.add('ymaps-control-active');
-                    planimeterModeElem.classList.remove('ymaps-control-active');
+            if (!rulerActive) {
+                rulerComponent.update({type: 'ruler', editable: true});
+                map.addChild(rulerComponent);
+                map.container.addEventListener('click', handleRulerMapClick, true);
 
-                    mapControls[panel].panel.addChild(rulerModeButton);
-                    mapControls[panel].panel.addChild(planimeterModeButton);
+                rulerModeElem.classList.add('ymaps-control-active');
+                planimeterModeElem.classList.remove('ymaps-control-active');
 
-                    rulerActive = true;
-                } else {
-                    stopRulerActionsLocalization();
-                    map.container.removeEventListener('click', handleRulerMapClick, true);
-                    map.removeChild(rulerComponent);
+                const controlIndex = activePanel.children.indexOf(rulerControl);
+                const insertIndex = controlIndex >= 0 ? controlIndex + 1 : activePanel.children.length;
+                activePanel.addChild(rulerModeButton, insertIndex);
+                activePanel.addChild(planimeterModeButton, insertIndex + 1);
 
-                    mapControls[panel].panel.removeChild(rulerModeButton);
-                    mapControls[panel].panel.removeChild(planimeterModeButton);
+                rulerActive = true;
+            } else {
+                stopRulerActionsLocalization();
+                map.container.removeEventListener('click', handleRulerMapClick, true);
+                map.removeChild(rulerComponent);
 
-                    rulerActive = false;
-                }
-            },
-            //text: 'Линейка'
-            element: rulerIcon
-        }), priority: order});
-    }
+                activePanel.removeChild(rulerModeButton);
+                activePanel.removeChild(planimeterModeButton);
 
-    function handleRulerMapClick() {
-        if (!rulerActive) {
-            return;
-        }
+                rulerActive = false;
+            }
+        },
+        element: rulerIcon
+    });
 
-        scheduleRulerActionsLocalization(getMap().container);
-    }
+    return rulerControl;
     // МОДУЛЬ ЛИНЕЙКИ КОНЕЦ
 }
 
 /**
  * @param ymaps3 - namespace Yandex Maps API v3
  * @param getMap - функция-геттер экземпляра карты
- * @param getYandexmapProps - функция-геттер настроек элемента карты
- * @param getMapControls - функция-геттер реестра контролов карты
  * @param getUtilsModule - функция-геттер вспомогательного модуля карты
- * @returns {{postprocess(): void}}
+ * @param MARKER_ANIMATION - объект с параметрами анимации для маркера
+ * @returns {{element: *, afterAttachCallback: (function(): void)}}
  */
 export function addSearchControl({
     ymaps3,
     getMap,
-    getYandexmapProps,
-    getMapControls,
-    getUtilsModule
+    getUtilsModule,
+    MARKER_ANIMATION
 }) {
-    const yandexmapProps = getYandexmapProps();
-    const mapControls = getMapControls();
     const lastSearchedMarkers = [];
     let searchInputValue = '';
     const clearSearchResultHandler = () => {
@@ -189,7 +182,7 @@ export function addSearchControl({
                 subtitle: result.properties.description,
                 coordinates: result.geometry.coordinates,
                 onClick: () => {
-                    map.update({location: {center: result.geometry.coordinates, easing: 'ease-in-out', zoom: 17, duration: 400}});
+                    map.update({location: {center: result.geometry.coordinates, zoom: 17, ...MARKER_ANIMATION}});
                 }
             });
             searchResultMarker._container.style.cursor = 'pointer';
@@ -209,23 +202,17 @@ export function addSearchControl({
         });
 
         if (results.length === 1) {
-            map.update({location: {center: results[0].geometry.coordinates, easing: 'ease-in-out', zoom: 17, duration: 400}});
+            map.update({location: {center: results[0].geometry.coordinates, zoom: 17, ...MARKER_ANIMATION}});
         } else if (results.length > 1) {
-            map.update({location: {bounds: utilsModule.getBounds(results.map(result => result.geometry.coordinates)), easing: 'ease-in-out', duration: 400}});
+            map.update({location: {bounds: utilsModule.getBounds(results.map(result => result.geometry.coordinates)), ...MARKER_ANIMATION}});
         }
     };
 
     const yMapSearchControl = new ymaps3.YMapSearchControl({searchResult: searchResultHandler});
 
-    if (yandexmapProps['show_search_control']) {
-        const panel = yandexmapProps['show_search_control_panel'];
-        const order = yandexmapProps['show_search_control_order'];
-
-        mapControls[panel].list.push({value: yMapSearchControl, priority: order});
-    }
-
     return {
-        postprocess() {
+        element: yMapSearchControl,
+        afterAttachCallback() {
             const searchControl = yMapSearchControl?._search;
 
             // ограничиваем размер поисковых предложений размерами контейнера карты

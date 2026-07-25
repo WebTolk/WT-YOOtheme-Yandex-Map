@@ -106,24 +106,41 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         function applyInitialCentering(map, cfg, yandexmapProps, markers) {
-            if (yandexmapProps['centering_mode'] === 'onLastMarker' && markers.length > 0) {
-                const [lastMarkerLng, lastMarkerLat] = markers[markers.length - 1].coordinates;
-                map.update({location: {center: [lastMarkerLng, lastMarkerLat], ...MARKER_ANIMATION}});
+            if (markers.length <= 0) {
+                return;
             }
 
-            if (yandexmapProps['centering_mode'] === 'fitAllMarkers') {
-                const bounds = utilsModule.getBounds(markers.map(val => val.coordinates));
-                bounds[0][1] += utilsModule.convertPixelOffsetToLatitude(map, yandexmapProps['center_offset_y'] || 0, cfg.margin);
-                bounds[1][1] += utilsModule.convertPixelOffsetToLatitude(map, yandexmapProps['center_offset_y'] || 0, cfg.margin);
-                bounds[0][0] -= utilsModule.convertPixelOffsetToLongitude(map, yandexmapProps['center_offset_x'] || 0, cfg.margin);
-                bounds[1][0] -= utilsModule.convertPixelOffsetToLongitude(map, yandexmapProps['center_offset_x'] || 0, cfg.margin);
-
-                if (markers.length === 1) {
-                    map.update({location: {center: [bounds[0][0], bounds[0][1]], ...MARKER_ANIMATION}});
-                } else if (markers.length > 1) {
-                    map.update({location: {bounds: bounds, ...MARKER_ANIMATION}});
+            const mapCfg = {
+                location: {
+                    ...MARKER_ANIMATION
                 }
+            };
+
+            switch (yandexmapProps['centering_mode']) {
+                case 'onLastMarker':
+                    const [lastMarkerLng, lastMarkerLat] = markers[markers.length - 1].coordinates;
+                    mapCfg.location.center = [lastMarkerLng, lastMarkerLat];
+                    break;
+                case 'fitAllMarkers':
+                    // логика обновления карты по умолчанию - как в режиме fitAllMarkers
+                default:
+                    const bounds = utilsModule.getBounds(markers.map(val => val.coordinates));
+                    const offsetX = yandexmapProps['center_offset_x'] || 0;
+                    const offsetY = yandexmapProps['center_offset_y'] || 0;
+                    bounds[0][1] += utilsModule.convertPixelOffsetToLatitude(map, offsetY, cfg.margin);
+                    bounds[1][1] += utilsModule.convertPixelOffsetToLatitude(map, offsetY, cfg.margin);
+                    bounds[0][0] -= utilsModule.convertPixelOffsetToLongitude(map, offsetX, cfg.margin);
+                    bounds[1][0] -= utilsModule.convertPixelOffsetToLongitude(map, offsetX, cfg.margin);
+
+                    if (markers.length === 1) {
+                        mapCfg.location.center = [bounds[0][0], bounds[0][1]];
+                    } else if (markers.length > 1) {
+                        mapCfg.location.bounds = bounds;
+                    }
+                    break;
             }
+
+            map.update(mapCfg);
         }
 
         function createFullscreenControl(elementTag, ymaps3, map) {
@@ -154,6 +171,34 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 },
                 element: fullScreenBtn
+            });
+        }
+
+        function createMapListener(ymaps3, activeMarkers) {
+            let lastInteractableMarker = null;
+
+            return new ymaps3.YMapListener({
+                layer: 'any',
+                onClick: (object) => {
+                    if (object) {
+                        if (object?.type === 'marker') {
+                            activeMarkers.forEach(marker => {
+                                if (object?.entity === marker?.children?.[0]) {
+                                    lastInteractableMarker = marker;
+                                    // console.log('set interactable marker -', marker._popupProps);
+                                }
+                            });
+                        }
+                    } else if (lastInteractableMarker) {
+                        lastInteractableMarker._togglePopup(0, false);
+                        lastInteractableMarker = null;
+                        // console.log('close last interactable marker');
+                    } else {
+                        const lastActiveMarker = [...activeMarkers][activeMarkers.size - 1];
+                        // console.warn('click outside any markers and there is no last interactable marker, try to close last active marker', lastActiveMarker?._popupProps);
+                        lastActiveMarker?._togglePopup(0, false);
+                    }
+                }
             });
         }
 
@@ -277,38 +322,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 // Закрываем всплывающее окно при клике вне его области
-                let lastInteractableMarker = null;
-                map.addChild(new ymaps3.YMapListener({
-                    layer: 'any',
-                    onClick: (object) => {
-                        if (object) {
-                            if (object?.type === 'marker') {
-                                activeMarkers.forEach(marker => {
-                                    if (object?.entity === marker?.children?.[0]) {
-                                        lastInteractableMarker = marker;
-                                        // console.log('set interactable marker -', marker._popupProps);
-                                    }
-                                });
-                            }
-                        } else if (lastInteractableMarker) {
-                            lastInteractableMarker._togglePopup(0, false);
-                            lastInteractableMarker = null;
-                            // console.log('close last interactable marker');
-                        } else {
-                            const lastActiveMarker = [...activeMarkers][activeMarkers.size - 1];
-                            // console.warn('click outside any markers and there is no last interactable marker, try to close last active marker', lastActiveMarker?._popupProps);
-                            lastActiveMarker?._togglePopup(0, false);
-                        }
-                        /*console.warn('click on', object.type);
-                        if (object.type === 'marker') {
-                            console.warn(object.entity, activeMarkers.values().next().value);
-                            console.warn(object.entity === activeMarkers.values().next().value.children[0]);
-                        }*/
-                        /*if (lastMarkerWithOpenedPopup && !object) {
-                            lastMarkerWithOpenedPopup._togglePopup(0, false);
-                        }*/
-                    }
-                }));
+                map.addChild(createMapListener(ymaps3, activeMarkers));
 
                 applyInitialCentering(map, cfg, yandexmapProps, markers);
             }
@@ -324,62 +338,60 @@ document.addEventListener('DOMContentLoaded', () => {
                 'bottomRight': {list: [], panel: new ymaps3.YMapControls({position: 'bottom right'})}
             };
 
-            // добавить вместо объекта element фабрику создания объекта, чтобы создавать объект только при реальном добавлении в список контролов
-            function addMapControl(propName, element) {
+            function addMapControl(propName, elementFactory) {
                 if (!yandexmapProps[propName]) {
                     return;
                 }
 
+                if (typeof elementFactory !== 'function') {
+                    throw new TypeError('WT YOOtheme Yandex Map: "elementFactory" must be a function');
+                }
+
                 const panel = yandexmapProps[propName + '_panel'];
                 const order = yandexmapProps[propName + '_order'];
+                let factoryResult = elementFactory();
 
-                mapControls[panel].list.push({value: element, priority: order});
+                if (!factoryResult) {
+                    throw new TypeError('WT YOOtheme Yandex Map: "elementFactory" must return a non-null result');
+                }
+
+                if (typeof factoryResult !== 'object' || !('element' in factoryResult)) {
+                    factoryResult = {element: factoryResult};
+                }
+
+                if (!factoryResult.element) {
+                    throw new TypeError('WT YOOtheme Yandex Map: "factoryResult.element" property must be a non-null object');
+                }
+
+                mapControls[panel].list.push({
+                    value: factoryResult.element,
+                    priority: order,
+                    afterAttachCallback: factoryResult.afterAttachCallback
+                });
             }
 
-            addMapControl('show_zoom_controls', new ymaps3.YMapZoomControl());
+            function attachMapControls(map, mapControls) {
+                for (let panel in mapControls) {
+                    const panelControls = mapControls[panel].list;
+                    const mapControlPanel = mapControls[panel].panel;
 
-            addMapControl('show_fullscreen_control', createFullscreenControl(YANDEX_ELEMENT_TAG, ymaps3, map));
+                    panelControls.sort((a, b) => a.priority - b.priority);
+                    panelControls.forEach(control => {
+                        mapControlPanel.addChild(control.value);
+                    });
 
-            controlsModule.addRulerControl({
-                ymaps3,
-                getMap: () => map,
-                getYandexmapProps: () => yandexmapProps,
-                getMapControls: () => mapControls,
-                getYandexElementTag: () => YANDEX_ELEMENT_TAG
-            });
+                    if (panelControls.length <= 0) {
+                        continue;
+                    }
 
-            addMapControl('show_geolocation_control', new ymaps3.YMapGeolocationControl());
-            addMapControl('show_rotate_control', new ymaps3.YMapRotateControl());
-            addMapControl('show_tilt_control', new ymaps3.YMapTiltControl());
-            addMapControl('show_rotate_tilt_controls', new ymaps3.YMapRotateTiltControl());
-
-            const searchControl = controlsModule.addSearchControl({
-                ymaps3,
-                getMap: () => map,
-                getYandexmapProps: () => yandexmapProps,
-                getMapControls: () => mapControls,
-                getUtilsModule: () => utilsModule
-            });
-
-            // Добавление элементов управления на карту
-            for (let panel in mapControls) {
-                mapControls[panel].list.sort((a, b) => a.priority - b.priority);
-                mapControls[panel].list.forEach(o => mapControls[panel].panel.addChild(o.value));
-                if (mapControls[panel].list.length > 0) {
-                    map.addChild(mapControls[panel].panel);
+                    map.addChild(mapControlPanel);
+                    panelControls.forEach(control => {
+                        control.afterAttachCallback?.();
+                    });
                 }
             }
 
-            // Открытие всплывающих окон при загрузке страницы,
-            // если указан соответствующий параметр в настройках маркера
-            markersWithShowOnLoadPopup.forEach(marker => {
-                marker._togglePopup(1, false);
-            });
-
-            searchControl.postprocess();
-
-            // Логика перетаскивания карты двумя пальцами для моб. устройств
-            if (utilsModule.isMobileDevice()) {
+            function applyMobileDrag(elem, map, activeMarkers) {
                 let hint = document.createElement('div');
                 hint.innerHTML = 'Передвинуть карту можно двумя пальцами';
                 hint.classList.add('map-hint-mobile');
@@ -412,6 +424,40 @@ document.addEventListener('DOMContentLoaded', () => {
                         map.setBehaviors(map.behaviors.filter(value => value !== 'drag'));
                     }
                 });
+            }
+
+            addMapControl('show_zoom_controls', () => new ymaps3.YMapZoomControl());
+            addMapControl('show_fullscreen_control', () => createFullscreenControl(YANDEX_ELEMENT_TAG, ymaps3, map));
+            addMapControl('show_ruler_control', () => controlsModule.addRulerControl({
+                ymaps3,
+                getMap: () => map,
+                getActivePanel: () => mapControls[yandexmapProps['show_ruler_control_panel']].panel,
+                YANDEX_ELEMENT_TAG
+            }));
+            addMapControl('show_geolocation_control', () => new ymaps3.YMapGeolocationControl());
+            addMapControl('show_rotate_control', () => new ymaps3.YMapRotateControl());
+            addMapControl('show_tilt_control', () => new ymaps3.YMapTiltControl());
+            addMapControl('show_rotate_tilt_controls', () => new ymaps3.YMapRotateTiltControl());
+            addMapControl('show_search_control', () => controlsModule.addSearchControl({
+                ymaps3,
+                getMap: () => map,
+                getUtilsModule: () => utilsModule,
+                MARKER_ANIMATION
+            }));
+
+            // Добавление элементов управления на карту
+            attachMapControls(map, mapControls);
+
+            // Открытие всплывающих окон при загрузке страницы,
+            // если указан соответствующий параметр в настройках маркера
+            markersWithShowOnLoadPopup.forEach(marker => {
+                // Третий параметр разрешает только отображение всплывающего окна, без центрирования
+                marker._togglePopup(1, false, false);
+            });
+
+            // Логика перетаскивания карты двумя пальцами для моб. устройств
+            if (utilsModule.isMobileDevice()) {
+                applyMobileDrag(elem, map, activeMarkers);
             }
         }
 
