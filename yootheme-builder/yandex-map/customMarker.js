@@ -86,7 +86,7 @@ export function createCustomMarker(YMapDefaultMarker, {
             return this._popup;
         }
 
-        _togglePopup(e, closeOtherPopups = true) {
+        _togglePopup(e, closeOtherPopups = true, shouldFirePopupToggledEvent = true) {
             // Если всплывающее окно уже открыто - ничего не делаем
             if (e && this._popupIsOpen) {
                 return;
@@ -119,6 +119,10 @@ export function createCustomMarker(YMapDefaultMarker, {
                     popupContainer.addEventListener('wheel', e => {
                         e.stopPropagation();
                     }, {passive: true});
+                }
+
+                if (!shouldFirePopupToggledEvent) {
+                    return;
                 }
 
                 // Вызов события popupToggled и пересчет размеров контейнера
