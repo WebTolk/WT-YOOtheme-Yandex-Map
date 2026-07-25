@@ -221,7 +221,8 @@
                 "min": 0,
                 "max": 21,
                 "step": 1
-            }
+            },
+            "enable": "centering_mode != 'fitAllMarkers'"
         },
         "zooming": {
             "label": "Behaviors",
@@ -255,11 +256,17 @@
         "center_offset_x": {
             "label": "Offset X",
             "type": "number",
+            "attrs": {
+                "placeholder": "0 px"
+            },
             "enable": "centering_mode == 'fitAllMarkers'"
         },
         "center_offset_y": {
             "label": "Offset Y",
             "type": "number",
+            "attrs": {
+                "placeholder": "0 px"
+            },
             "enable": "centering_mode == 'fitAllMarkers'"
         },
         "map_padding": {
