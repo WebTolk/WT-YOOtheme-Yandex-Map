@@ -77,7 +77,7 @@
             "type": "color"
         },
         "marker_icon_offset_x": {
-            "label": "Offset X",
+            "label": "Horizontal Offset",
             "type": "number",
             "attrs": {
                 "placeholder": "auto"
@@ -85,7 +85,7 @@
             "enable": "marker_icon"
         },
         "marker_icon_offset_y": {
-            "label": "Offset Y",
+            "label": "Vertical Offset",
             "type": "number",
             "attrs": {
                 "placeholder": "auto"
@@ -94,7 +94,7 @@
         },
         "marker_icon_loading": {
             "label": "Loading",
-            "description": "By default, images are loaded lazy. Enable eager loading for images in the initial viewport.",
+            "description": "By default, images are loaded lazy.<br><br>Enable eager loading for images in the initial viewport",
             "type": "checkbox",
             "text": "Load image eagerly",
             "enable": "marker_icon"
@@ -207,7 +207,7 @@
                         "link_aria_label",
                         "marker_icon",
                         {
-                            "description": "Setting just one value preserves the original proportions. The image will be resized and cropped automatically, and where possible, high resolution images will be auto-generated",
+                            "description": "Setting just one value preserves the original proportions.<br><br>The image will be resized and cropped automatically, and where possible, high resolution images will be auto-generated",
                             "name": "_marker_dimension",
                             "type": "grid",
                             "width": "1-3",

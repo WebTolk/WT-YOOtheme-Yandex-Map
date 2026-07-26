@@ -1,4 +1,40 @@
 /**
+ * @param elementTag - CSS-префикс yandex-элемента
+ * @param ymaps3 - namespace Yandex Maps API v3
+ * @param map - экземпляр карты
+ */
+export function createFullscreenControl(elementTag, ymaps3, map) {
+    const fullScreenBtn = document.createElement('div');
+    fullScreenBtn.classList.add(`${elementTag}--control-fullscreen`);
+    fullScreenBtn.innerHTML = `
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <g clip-path="url(#clip0_1470_10318)" transform="matrix(0.938241, 0, 0, 0.938102, -1.285652, -1.081787)">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M23.752 4.59473C23.7619 4.45662 23.6471 4.3418 23.5089 4.35171L18.4336 4.71611C18.1746 4.7347 18.0574 5.04912 18.241 5.23274L19.7842 6.776L14.771 11.7892L16.3141 13.3323L21.3273 8.31911L22.8709 9.86269C23.0545 10.0463 23.369 9.92909 23.3876 9.67008L23.752 4.59473Z" fill="currentColor"/>
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M4.56835 23.2952C4.55844 23.4333 4.67326 23.5481 4.81137 23.5382L9.88672 23.1738C10.1457 23.1552 10.263 22.8408 10.0793 22.6571L8.53608 21.1139L13.5493 16.1007L12.0062 14.5576L6.99297 19.5708L5.44938 18.0272C5.26577 17.8436 4.95134 17.9608 4.93275 18.2198L4.56835 23.2952Z" fill="currentColor"/>
+          </g>
+          <defs>
+            <clipPath id="clip0_1470_10318">
+              <rect width="24" height="24" fill="white"/>
+            </clipPath>
+          </defs>
+        </svg>
+    `;
+
+    return new ymaps3.YMapControlButton({
+        onClick: () => {
+            if (document.fullscreenElement) {
+                document.exitFullscreen();
+                fullScreenBtn.classList.remove('ymaps-control-active');
+            } else {
+                map.container.parentNode.requestFullscreen();
+                fullScreenBtn.classList.add('ymaps-control-active');
+            }
+        },
+        element: fullScreenBtn
+    });
+}
+
+/**
  * @param ymaps3 - namespace Yandex Maps API v3
  * @param getMap - функция-геттер экземпляра карты
  * @param getActivePanel - функция-геттер активной панели контролов, в которую во время работы линейки добавляются кнопки выбора режима

@@ -136,7 +136,7 @@ export function popupLink(props, marker) {
     }
 
     const link = document.createElement('div');
-    setTopMargin(link, props['link_margin']);
+    applyTopMargin(link, props['link_margin']);
     const aLink = document.createElement('a');
     aLink.href = marker['link'];
     if (props['link_target']) {
@@ -193,7 +193,7 @@ export function popupElem(type, props, value, isTextContent = true) {
     }
 
     const elem = document.createElement(props[type + '_element'] || 'div');
-    setTopMargin(elem, props[type + '_margin']);
+    applyTopMargin(elem, props[type + '_margin']);
     addOptionalClass(elem, 'uk-text-', props[type + '_color']);
     addOptionalClass(elem, 'uk-', props[type + '_style']);
     addOptionalClass(elem, 'uk-heading-', props[type + '_decoration']);
@@ -207,6 +207,18 @@ export function popupElem(type, props, value, isTextContent = true) {
     return elem.outerHTML;
 }
 
+export function buildMarkerPopupContent(yandexmapProps, markerData) {
+    let contentHTML = '';
+
+    contentHTML += popupImage(yandexmapProps, markerData);
+    contentHTML += popupElem('title', yandexmapProps, markerData['title']);
+    contentHTML += popupElem('meta', yandexmapProps, markerData['meta']);
+    contentHTML += popupElem('content', yandexmapProps, markerData['content'], false);
+    contentHTML += popupLink(yandexmapProps, markerData);
+
+    return contentHTML;
+}
+
 export function processSrc(value) {
     let srcAttr = '';
 
@@ -218,7 +230,7 @@ export function processSrc(value) {
     return srcAttr;
 }
 
-function setTopMargin(elem, margin) {
+function applyTopMargin(elem, margin) {
     let className = 'uk-margin-';
     if (margin) {
         className += margin + '-';

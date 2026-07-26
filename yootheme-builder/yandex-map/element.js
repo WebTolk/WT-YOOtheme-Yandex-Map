@@ -15,6 +15,16 @@ document.addEventListener('DOMContentLoaded', () => {
             easing: 'ease-in-out',
             duration: 400
         };
+        const MAP_CONTROLS_POSITIONS = {
+            top: 'top',
+            left: 'left',
+            bottom: 'bottom',
+            right: 'right',
+            topLeft: 'top left',
+            topRight: 'top right',
+            bottomLeft: 'bottom left',
+            bottomRight: 'bottom right'
+        };
 
         async function getYandexApi() {
             return loadYandexApi({
@@ -36,18 +46,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     ]
                 }
             });
-        }
-
-        function buildMarkerPopupContent(yandexmapProps, markerData) {
-            let contentHTML = '';
-
-            contentHTML += utilsModule.popupImage(yandexmapProps, markerData);
-            contentHTML += utilsModule.popupElem('title', yandexmapProps, markerData['title']);
-            contentHTML += utilsModule.popupElem('meta', yandexmapProps, markerData['meta']);
-            contentHTML += utilsModule.popupElem('content', yandexmapProps, markerData['content'], false);
-            contentHTML += utilsModule.popupLink(yandexmapProps, markerData);
-
-            return contentHTML;
         }
 
         function createPopupToggledHandler(map, cfg) {
@@ -91,7 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (!markerData['hide_popup']) {
                 markerCfg.popup = {
-                    content: buildMarkerPopupContent(yandexmapProps, markerData),
+                    content: utilsModule.buildMarkerPopupContent(yandexmapProps, markerData),
                     position: markerData['popup_position']
                 };
             }
@@ -110,68 +108,51 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            const mapCfg = {
+            const updateCfg = {
                 location: {
                     ...MARKER_ANIMATION
                 }
             };
 
             switch (yandexmapProps['centering_mode']) {
+                case 'fromCoords':
+                    if (cfg.location.center) {
+                        // копируем исходный центр карты в объект конфига для применения смещений
+                        updateCfg.location.center = cfg.location.center;
+                    }
+                    break;
                 case 'onLastMarker':
                     const [lastMarkerLng, lastMarkerLat] = markers[markers.length - 1].coordinates;
-                    mapCfg.location.center = [lastMarkerLng, lastMarkerLat];
+                    updateCfg.location.center = [lastMarkerLng, lastMarkerLat];
                     break;
                 case 'fitAllMarkers':
-                    // логика обновления карты по умолчанию - как в режиме fitAllMarkers
-                default:
                     const bounds = utilsModule.getBounds(markers.map(val => val.coordinates));
-                    const offsetX = yandexmapProps['center_offset_x'] || 0;
-                    const offsetY = yandexmapProps['center_offset_y'] || 0;
-                    bounds[0][1] += utilsModule.convertPixelOffsetToLatitude(map, offsetY, cfg.margin);
-                    bounds[1][1] += utilsModule.convertPixelOffsetToLatitude(map, offsetY, cfg.margin);
-                    bounds[0][0] -= utilsModule.convertPixelOffsetToLongitude(map, offsetX, cfg.margin);
-                    bounds[1][0] -= utilsModule.convertPixelOffsetToLongitude(map, offsetX, cfg.margin);
-
                     if (markers.length === 1) {
-                        mapCfg.location.center = [bounds[0][0], bounds[0][1]];
+                        updateCfg.location.center = [bounds[0][0], bounds[0][1]];
                     } else if (markers.length > 1) {
-                        mapCfg.location.bounds = bounds;
+                        updateCfg.location.bounds = bounds;
                     }
                     break;
+                default: break;
             }
 
-            map.update(mapCfg);
-        }
+            // Применяем смещения по X и Y к позициии карты, если они указаны
+            const offsetX = yandexmapProps['center_offset_x'] || 0;
+            const offsetY = yandexmapProps['center_offset_y'] || 0;
+            const offsetLat = utilsModule.convertPixelOffsetToLatitude(map, offsetY, cfg.margin);
+            const offsetLng = utilsModule.convertPixelOffsetToLongitude(map, offsetX, cfg.margin);
 
-        function createFullscreenControl(elementTag, ymaps3, map) {
-            const fullScreenBtn = document.createElement('div');
-            fullScreenBtn.classList.add(`${elementTag}--control-fullscreen`);
-            fullScreenBtn.innerHTML = `
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <g clip-path="url(#clip0_1470_10318)" transform="matrix(0.938241, 0, 0, 0.938102, -1.285652, -1.081787)">
-                    <path fill-rule="evenodd" clip-rule="evenodd" d="M23.752 4.59473C23.7619 4.45662 23.6471 4.3418 23.5089 4.35171L18.4336 4.71611C18.1746 4.7347 18.0574 5.04912 18.241 5.23274L19.7842 6.776L14.771 11.7892L16.3141 13.3323L21.3273 8.31911L22.8709 9.86269C23.0545 10.0463 23.369 9.92909 23.3876 9.67008L23.752 4.59473Z" fill="currentColor"/>
-                    <path fill-rule="evenodd" clip-rule="evenodd" d="M4.56835 23.2952C4.55844 23.4333 4.67326 23.5481 4.81137 23.5382L9.88672 23.1738C10.1457 23.1552 10.263 22.8408 10.0793 22.6571L8.53608 21.1139L13.5493 16.1007L12.0062 14.5576L6.99297 19.5708L5.44938 18.0272C5.26577 17.8436 4.95134 17.9608 4.93275 18.2198L4.56835 23.2952Z" fill="currentColor"/>
-                  </g>
-                  <defs>
-                    <clipPath id="clip0_1470_10318">
-                      <rect width="24" height="24" fill="white"/>
-                    </clipPath>
-                  </defs>
-                </svg>
-            `;
+            if (updateCfg.location.center) {
+                updateCfg.location.center[0] += offsetLng;
+                updateCfg.location.center[1] += offsetLat;
+            } else if (updateCfg.location.bounds) {
+                updateCfg.location.bounds[0][1] += offsetLat;
+                updateCfg.location.bounds[1][1] += offsetLat;
+                updateCfg.location.bounds[0][0] -= offsetLng;
+                updateCfg.location.bounds[1][0] -= offsetLng;
+            }
 
-            return new ymaps3.YMapControlButton({
-                onClick: () => {
-                    if (document.fullscreenElement) {
-                        document.exitFullscreen();
-                        fullScreenBtn.classList.remove('ymaps-control-active');
-                    } else {
-                        map.container.parentNode.requestFullscreen();
-                        fullScreenBtn.classList.add('ymaps-control-active');
-                    }
-                },
-                element: fullScreenBtn
-            });
+            map.update(updateCfg);
         }
 
         function createMapListener(ymaps3, activeMarkers) {
@@ -200,6 +181,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }
             });
+        }
+
+        function createMapControls(ymaps3, mapControlsPositions) {
+            return Object.fromEntries(
+                Object.entries(mapControlsPositions).map(([key, position]) => [
+                    key,
+                    {list: [], panel: new ymaps3.YMapControls({position})}
+                ])
+            );
         }
 
         async function build(elem, yandexmapProps) {
@@ -234,11 +224,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 };
             }
 
-            // при использовании компонента uk-height-viewport с параметром offset-top: true,
-            // скрипт вычисляет значение min-height. Так как контейнер для яндекс карт должен иметь атрибут height,
-            // здесь мы просто присваиваем атрибуту height вычисленное значение min-height.
-            if (elem.__uikit__ && elem.__uikit__.heightViewport) {
-                elem.style.height = elem.__uikit__.heightViewport._data.minHeight;
+            // при использовании компонента uk-height-viewport с параметром offset-top: true, скрипт вычисляет значение min-height.
+            // Так как контейнер для яндекс карт должен иметь атрибут height, здесь мы присваиваем атрибуту height вычисленное значение min-height.
+            const heightViewport = elem.__uikit__?.heightViewport;
+            if (heightViewport) {
+                elem.style.height = heightViewport._data.minHeight;
             }
             //
             const map = new ymaps3.YMap(elem, cfg);
@@ -247,6 +237,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     map.addChild(new ymaps3.YMapDefaultSatelliteLayer());
                     break;
                 case 'scheme':
+                    // Тип карты по умолчанию - схема
                 default:
                     map.addChild(new ymaps3.YMapDefaultSchemeLayer({
                         theme: yandexmapProps['map_theme']
@@ -316,27 +307,19 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                     map.addChild(clusterer);
                 } else {
-                    markers.forEach(value => {
-                        map.addChild(value);
+                    markers.forEach(marker => {
+                        map.addChild(marker);
                     });
                 }
 
-                // Закрываем всплывающее окно при клике вне его области
+                // Добавляем обработчик событий карты - закрываем всплывающее окно при клике вне его области
                 map.addChild(createMapListener(ymaps3, activeMarkers));
 
+                // Начальное позиционирование карты
                 applyInitialCentering(map, cfg, yandexmapProps, markers);
             }
 
-            const mapControls = {
-                'top': {list: [], panel: new ymaps3.YMapControls({position: 'top'})},
-                'left': {list: [], panel: new ymaps3.YMapControls({position: 'left'})},
-                'bottom': {list: [], panel: new ymaps3.YMapControls({position: 'bottom'})},
-                'right': {list: [], panel: new ymaps3.YMapControls({position: 'right'})},
-                'topLeft': {list: [], panel: new ymaps3.YMapControls({position: 'top left'})},
-                'topRight': {list: [], panel: new ymaps3.YMapControls({position: 'top right'})},
-                'bottomLeft': {list: [], panel: new ymaps3.YMapControls({position: 'bottom left'})},
-                'bottomRight': {list: [], panel: new ymaps3.YMapControls({position: 'bottom right'})}
-            };
+            const mapControls = createMapControls(ymaps3, MAP_CONTROLS_POSITIONS);
 
             function addMapControl(propName, elementFactory) {
                 if (!yandexmapProps[propName]) {
@@ -347,9 +330,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     throw new TypeError('WT YOOtheme Yandex Map: "elementFactory" must be a function');
                 }
 
-                const panel = yandexmapProps[propName + '_panel'];
+                const panelName = yandexmapProps[propName + '_panel'];
                 const order = yandexmapProps[propName + '_order'];
-                let factoryResult = elementFactory();
+                let factoryResult = elementFactory(mapControls[panelName].panel);
 
                 if (!factoryResult) {
                     throw new TypeError('WT YOOtheme Yandex Map: "elementFactory" must return a non-null result');
@@ -363,7 +346,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     throw new TypeError('WT YOOtheme Yandex Map: "factoryResult.element" property must be a non-null object');
                 }
 
-                mapControls[panel].list.push({
+                mapControls[panelName].list.push({
                     value: factoryResult.element,
                     priority: order,
                     afterAttachCallback: factoryResult.afterAttachCallback
@@ -371,20 +354,20 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             function attachMapControls(map, mapControls) {
-                for (let panel in mapControls) {
-                    const panelControls = mapControls[panel].list;
-                    const mapControlPanel = mapControls[panel].panel;
+                for (let panelName in mapControls) {
+                    const panelControls = mapControls[panelName].list;
+                    const panel = mapControls[panelName].panel;
 
                     panelControls.sort((a, b) => a.priority - b.priority);
                     panelControls.forEach(control => {
-                        mapControlPanel.addChild(control.value);
+                        panel.addChild(control.value);
                     });
 
                     if (panelControls.length <= 0) {
                         continue;
                     }
 
-                    map.addChild(mapControlPanel);
+                    map.addChild(panel);
                     panelControls.forEach(control => {
                         control.afterAttachCallback?.();
                     });
@@ -427,11 +410,11 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             addMapControl('show_zoom_controls', () => new ymaps3.YMapZoomControl());
-            addMapControl('show_fullscreen_control', () => createFullscreenControl(YANDEX_ELEMENT_TAG, ymaps3, map));
-            addMapControl('show_ruler_control', () => controlsModule.addRulerControl({
+            addMapControl('show_fullscreen_control', () => controlsModule.createFullscreenControl(YANDEX_ELEMENT_TAG, ymaps3, map));
+            addMapControl('show_ruler_control', (activePanel) => controlsModule.addRulerControl({
                 ymaps3,
                 getMap: () => map,
-                getActivePanel: () => mapControls[yandexmapProps['show_ruler_control_panel']].panel,
+                getActivePanel: () => activePanel,
                 YANDEX_ELEMENT_TAG
             }));
             addMapControl('show_geolocation_control', () => new ymaps3.YMapGeolocationControl());

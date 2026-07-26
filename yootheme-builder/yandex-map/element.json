@@ -79,7 +79,7 @@
             "text": "Show the image"
         },
         "show_link": {
-            "description": "Show or hide content fields without the need to delete the content itself.",
+            "description": "Show or hide content fields without the need to delete the content itself",
             "type": "checkbox",
             "text": "Show the link"
         },
@@ -109,7 +109,7 @@
             "default": "#FF3333"
         },
         "marker_icon_offset_x": {
-            "label": "Offset X",
+            "label": "Horizontal Offset",
             "type": "number",
             "attrs": {
                 "placeholder": "auto"
@@ -117,7 +117,7 @@
             "enable": "marker_icon"
         },
         "marker_icon_offset_y": {
-            "label": "Offset Y",
+            "label": "Vertical Offset",
             "type": "number",
             "attrs": {
                 "placeholder": "auto"
@@ -126,14 +126,14 @@
         },
         "marker_icon_loading": {
             "label": "Loading",
-            "description": "By default, images are loaded lazy. Enable eager loading for images in the initial viewport.",
+            "description": "By default, images are loaded lazy.<br><br>Enable eager loading for images in the initial viewport",
             "type": "checkbox",
             "text": "Load image eagerly",
             "enable": "marker_icon"
         },
         "marker_icon_border": {
             "label": "Border",
-            "description": "Select the image border style.",
+            "description": "Select the image border style",
             "type": "select",
             "options": {
                 "None": "",
@@ -170,7 +170,7 @@
             "enable": "cluster_icon_1"
         },
         "cluster_icon_1_offset_x": {
-            "label": "Offset X",
+            "label": "Horizontal Offset",
             "type": "number",
             "attrs": {
                 "placeholder": "auto"
@@ -178,7 +178,7 @@
             "enable": "cluster_icon_1"
         },
         "cluster_icon_1_offset_y": {
-            "label": "Offset Y",
+            "label": "Vertical Offset",
             "type": "number",
             "attrs": {
                 "placeholder": "auto"
@@ -187,14 +187,14 @@
         },
         "cluster_icon_1_loading": {
             "label": "Loading",
-            "description": "By default, images are loaded lazy. Enable eager loading for images in the initial viewport.",
+            "description": "By default, images are loaded lazy.<br><br>Enable eager loading for images in the initial viewport",
             "type": "checkbox",
             "text": "Load image eagerly",
             "enable": "marker_icon"
         },
         "cluster_icon_1_border": {
             "label": "Border",
-            "description": "Select the image border style.",
+            "description": "Select the image border style",
             "type": "select",
             "options": {
                 "None": "",
@@ -206,7 +206,7 @@
         },
         "type": {
             "label": "Type",
-            "description": "Choose a map type.",
+            "description": "Choose a map type",
             "type": "select",
             "options": {
                 "Scheme": "scheme",
@@ -215,7 +215,7 @@
         },
         "zoom": {
             "label": "Zoom",
-            "description": "Set the initial resolution at which to display the map. 0 is fully zoomed out and 21 is at the highest resolution zoomed in.",
+            "description": "Set the initial resolution at which to display the map",
             "type": "range",
             "attrs": {
                 "min": 0,
@@ -226,6 +226,7 @@
         },
         "zooming": {
             "label": "Behaviors",
+            "description": "Choose the map behaviors",
             "type": "checkbox",
             "text": "Zooming"
         },
@@ -234,7 +235,8 @@
             "text": "Dragging"
         },
         "centering_mode": {
-            "label": "Centering mode",
+            "label": "Initial Position",
+            "description": "Choose a map initial position mode",
             "type": "select",
             "options": {
                 "From coords": "fromCoords",
@@ -254,23 +256,22 @@
             "enable": "centering_mode == 'fromCoords'"
         },
         "center_offset_x": {
-            "label": "Offset X",
+            "label": "Horizontal Offset",
             "type": "number",
             "attrs": {
                 "placeholder": "0 px"
-            },
-            "enable": "centering_mode == 'fitAllMarkers'"
+            }
         },
         "center_offset_y": {
-            "label": "Offset Y",
+            "label": "Vertical Offset",
             "type": "number",
             "attrs": {
                 "placeholder": "0 px"
-            },
-            "enable": "centering_mode == 'fitAllMarkers'"
+            }
         },
         "map_padding": {
             "label": "Padding (in %)",
+            "description": "Set the padding of the map to % of the smaller side size of the element",
             "type": "range",
             "attrs": {
                 "min": 1,
@@ -472,7 +473,7 @@
         },
         "min_zoom": {
             "label": "Minimum Zoom",
-            "description": "Minimum zoom level of the map.",
+            "description": "Minimum zoom level of the map",
             "type": "range",
             "attrs": {
                 "min": 0,
@@ -483,7 +484,7 @@
         },
         "max_zoom": {
             "label": "Maximum Zoom",
-            "description": "Maximum zoom level of the map.",
+            "description": "Maximum zoom level of the map",
             "type": "range",
             "attrs": {
                 "min": 0,
@@ -519,13 +520,13 @@
         },
         "height": {
             "label": "Height",
-            "description": "Set the height in pixels.",
+            "description": "Set the height in pixels",
             "type": "number",
             "enable": "!viewport_height"
         },
         "width": {
             "label": "Width",
-            "description": "Set the width in pixels. If no width is set, the map takes the full width. If both width and height are set, the map is responsive like an image. Additionally, the width can be used as a breakpoint. The map takes the full width, but below the breakpoint it will start to shrink preserving the aspect ratio.",
+            "description": "Set the width in pixels.<br><br>If no width is set, the map takes the full width.<br><br>If both width and height are set, the map is responsive like an image.<br><br>Additionally, the width can be used as a breakpoint. The map takes the full width, but below the breakpoint it will start to shrink preserving the aspect ratio",
             "type": "number",
             "enable": "!viewport_height"
         },
@@ -549,7 +550,8 @@
             "text": "Enable marker clustering"
         },
         "cluster_grid_size": {
-            "label": "Cluster grid size",
+            "label": "Cluster Grid Size",
+            "description": "Set the grid size used to group markers into clusters.<br><br><strong>Note:</strong> Please specify values equal to powers of two (1, 2, 4, 8, 16 etc.).<br>Smaller values create more detailed clustering",
             "type": "number",
             "default": 64
         },
@@ -569,7 +571,7 @@
         },
         "title_style": {
             "label": "Style",
-            "description": "Title styles differ in font-size but may also come with a predefined color, size and font.",
+            "description": "Title styles differ in font-size but may also come with a predefined color, size and font",
             "type": "select",
             "options": {
                 "None": "",
@@ -589,14 +591,14 @@
         },
         "title_link": {
             "label": "Link",
-            "description": "Link the title if a link exists.",
+            "description": "Link the title if a link exists",
             "type": "checkbox",
             "text": "Link title",
             "enable": "show_title && show_link"
         },
         "title_hover_style": {
             "label": "Hover Style",
-            "description": "Set the hover style for a linked title.",
+            "description": "Set the hover style for a linked title",
             "type": "select",
             "options": {
                 "None": "reset",
@@ -607,7 +609,7 @@
         },
         "title_decoration": {
             "label": "Decoration",
-            "description": "Decorate the title with a divider, bullet or a line that is vertically centered to the heading.",
+            "description": "Decorate the title with a divider, bullet or a line that is vertically centered to the heading",
             "type": "select",
             "options": {
                 "None": "",
@@ -619,7 +621,7 @@
         },
         "title_font_family": {
             "label": "Font Family",
-            "description": "Select an alternative font family. Mind that not all styles have different font families.",
+            "description": "Select an alternative font family.<br><br>Mind that not all styles have different font families",
             "type": "select",
             "options": {
                 "None": "",
@@ -632,7 +634,7 @@
         },
         "title_color": {
             "label": "Color",
-            "description": "Select the text color. If the Background option is selected, styles that don't apply a background image use the primary color instead.",
+            "description": "Select the text color.<br><br>If the <strong>Background</strong> option is selected, styles that don't apply a background image use the primary color instead",
             "type": "select",
             "options": {
                 "None": "",
@@ -649,7 +651,7 @@
         },
         "title_element": {
             "label": "HTML Element",
-            "description": "Set the level for the section heading or give it no semantic meaning.",
+            "description": "Set the level for the section heading or give it no semantic meaning",
             "type": "select",
             "options": {
                 "h1": "h1",
@@ -664,7 +666,7 @@
         },
         "title_margin": {
             "label": "Margin Top",
-            "description": "Set the top margin. Note that the margin will only apply if the content field immediately follows another content field.",
+            "description": "Set the top margin.<br><br>Note that the margin will only apply if the content field immediately follows another content field",
             "type": "select",
             "options": {
                 "Small": "small",
@@ -678,7 +680,7 @@
         },
         "meta_style": {
             "label": "Style",
-            "description": "Select a predefined meta text style, including color, size and font-family.",
+            "description": "Select a predefined meta text style, including color, size and font-family",
             "type": "select",
             "options": {
                 "None": "",
@@ -697,7 +699,7 @@
         },
         "meta_color": {
             "label": "Color",
-            "description": "Select the text color.",
+            "description": "Select the text color",
             "type": "select",
             "options": {
                 "None": "",
@@ -713,7 +715,7 @@
         },
         "meta_align": {
             "label": "Alignment",
-            "description": "Align the meta text.",
+            "description": "Align the meta text",
             "type": "select",
             "options": {
                 "Above Title": "above-title",
@@ -724,7 +726,7 @@
         },
         "meta_element": {
             "label": "HTML Element",
-            "description": "Set the level for the section heading or give it no semantic meaning.",
+            "description": "Set the level for the section heading or give it no semantic meaning",
             "type": "select",
             "options": {
                 "h1": "h1",
@@ -739,7 +741,7 @@
         },
         "meta_margin": {
             "label": "Margin Top",
-            "description": "Set the top margin. Note that the margin will only apply if the content field immediately follows another content field.",
+            "description": "Set the top margin.<br><br>Note that the margin will only apply if the content field immediately follows another content field",
             "type": "select",
             "options": {
                 "Small": "small",
@@ -753,7 +755,7 @@
         },
         "content_style": {
             "label": "Style",
-            "description": "Select a predefined text style, including color, size and font-family.",
+            "description": "Select a predefined text style, including color, size and font-family",
             "type": "select",
             "options": {
                 "None": "",
@@ -772,7 +774,7 @@
         },
         "content_margin": {
             "label": "Margin Top",
-            "description": "Set the top margin. Note that the margin will only apply if the content field immediately follows another content field.",
+            "description": "Set the top margin.<br><br>Note that the margin will only apply if the content field immediately follows another content field",
             "type": "select",
             "options": {
                 "Small": "small",
@@ -798,14 +800,14 @@
         },
         "image_loading": {
             "label": "Loading",
-            "description": "By default, images are loaded lazy. Enable eager loading for images in the initial viewport.",
+            "description": "By default, images are loaded lazy.<br><br>Enable eager loading for images in the initial viewport",
             "type": "checkbox",
             "text": "Load image eagerly",
             "enable": "show_image"
         },
         "image_border": {
             "label": "Border",
-            "description": "Select the image border style.",
+            "description": "Select the image border style",
             "type": "select",
             "options": {
                 "None": "",
@@ -817,7 +819,7 @@
         },
         "image_link": {
             "label": "Link",
-            "description": "Link the image if a link exists.",
+            "description": "Link the image if a link exists",
             "type": "checkbox",
             "text": "Link image",
             "enable": "show_image && show_link"
@@ -830,17 +832,17 @@
         },
         "link_text": {
             "label": "Text",
-            "description": "Enter the text for the link.",
+            "description": "Enter the text for the link",
             "enable": "show_link"
         },
         "link_aria_label": {
             "label": "ARIA Label",
-            "description": "Enter a descriptive text label to make it accessible if the link has no visible text.",
+            "description": "Enter a descriptive text label to make it accessible if the link has no visible text",
             "enable": "show_link"
         },
         "link_style": {
             "label": "Style",
-            "description": "Set the link style.",
+            "description": "Set the link style",
             "type": "select",
             "options": {
                 "Button Default": "default",
@@ -856,7 +858,7 @@
         },
         "link_size": {
             "label": "Button Size",
-            "description": "Set the button size.",
+            "description": "Set the button size",
             "type": "select",
             "options": {
                 "Small": "small",
@@ -872,7 +874,7 @@
         },
         "link_margin": {
             "label": "Margin Top",
-            "description": "Set the top margin. Note that the margin will only apply if the content field immediately follows another content field.",
+            "description": "Set the top margin.<br><br>Note that the margin will only apply if the content field immediately follows another content field",
             "type": "select",
             "options": {
                 "Small": "small",
@@ -901,7 +903,7 @@
         "block_align_fallback": "${builder.block_align_fallback}",
         "item_text_align": {
             "label": "Text Alignment",
-            "description": "Center, left and right alignment may depend on a breakpoint and require a fallback.",
+            "description": "Center, left and right alignment may depend on a breakpoint and require a fallback",
             "type": "select",
             "options": {
                 "None": "",
@@ -1047,7 +1049,7 @@
                                 "max_zoom",
                                 {
                                     "label": "Viewport Height",
-                                    "description": "The height can adapt to the height of the viewport. <br><br>Note: Make sure no height is set in the section settings when using one of the viewport options.",
+                                    "description": "The height can adapt to the height of the viewport.<br><br><strong>Note:</strong> Make sure no height is set in the section settings when using one of the viewport options",
                                     "name": "_viewport_height",
                                     "type": "grid",
                                     "width": "expand,auto",
@@ -1069,14 +1071,17 @@
                             "fields": [
                                 {
                                     "label": "Control",
+                                    "description": "Choose which controls will be displayed on the map",
                                     "type": "group"
                                 },
                                 {
                                     "label": "Position",
+                                    "description": "Choose the position of the controls on the map",
                                     "type": "group"
                                 },
                                 {
                                     "label": "Order",
+                                    "description": "Set the display order of the controls within the selected area.<br><br><strong>Note:</strong> Lower values are shown first",
                                     "type": "group"
                                 }
                             ]
@@ -1213,7 +1218,7 @@
                             "fields": [
                                 {
                                     "label": "Width/Height",
-                                    "description": "Setting just one value preserves the original proportions. The image will be resized and cropped automatically, and where possible, high resolution images will be auto-generated",
+                                    "description": "Setting just one value preserves the original proportions.<br><br>The image will be resized and cropped automatically, and where possible, high resolution images will be auto-generated",
                                     "type": "grid",
                                     "width": "1-2",
                                     "fields": ["image_width", "image_height"]
