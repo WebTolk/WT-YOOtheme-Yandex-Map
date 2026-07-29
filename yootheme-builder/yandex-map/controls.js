@@ -31,16 +31,21 @@ export function createFullscreenControl(elementTag, ymaps3, map) {
 
     document.addEventListener('fullscreenchange', syncFullscreenState);
 
-    return new ymaps3.YMapControlButton({
-        onClick: () => {
-            if (document.fullscreenElement === fullscreenTarget) {
-                document.exitFullscreen().catch(() => {});
-            } else {
-                fullscreenTarget.requestFullscreen().catch(() => {});
-            }
-        },
-        element: fullScreenBtn
-    });
+    return {
+        element: new ymaps3.YMapControlButton({
+            onClick: () => {
+                if (document.fullscreenElement === fullscreenTarget) {
+                    document.exitFullscreen().catch(() => {});
+                } else {
+                    fullscreenTarget.requestFullscreen().catch(() => {});
+                }
+            },
+            element: fullScreenBtn
+        }),
+        cleanupCallback() {
+            document.removeEventListener('fullscreenchange', syncFullscreenState);
+        }
+    };
 }
 
 /**

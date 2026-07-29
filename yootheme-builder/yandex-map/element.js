@@ -196,8 +196,16 @@ document.addEventListener('DOMContentLoaded', () => {
             const ymaps3 = await getYandexApi();
 
             if (!ymaps3) {
-                return;
+                return () => {};
             }
+
+            const cleanupCallbacks = [];
+            const registerCleanup = callback => {
+                if (typeof callback !== 'function') {
+                    return;
+                }
+                cleanupCallbacks.push(callback);
+            };
 
             // Отступ карты - % от меньшей величины размеров карты
             const marginPx = Math.min(elem.clientWidth, elem.clientHeight) * (yandexmapProps['map_padding'] / 100);
@@ -351,6 +359,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     priority: order,
                     afterAttachCallback: factoryResult.afterAttachCallback
                 });
+
+                registerCleanup(factoryResult.cleanupCallback);
             }
 
             function attachMapControls(map, mapControls) {
@@ -383,7 +393,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 let touchCount = 0;
                 let touchStartTime = 0;
 
-                elem.addEventListener('touchstart', e => {
+                const handleTouchStart = e => {
                     touchCount = e.targetTouches.length;
                     if (touchCount === 1) {
                         touchStartTime = Date.now();
@@ -394,19 +404,23 @@ document.addEventListener('DOMContentLoaded', () => {
                             map.setBehaviors(map.behaviors);
                         }
                     }
-                });
-                elem.addEventListener('touchmove', e => {
+                };
+                const handleTouchMove = () => {
                     if (activeMarkers.size === 0 && touchCount === 1 && Date.now() - touchStartTime > 100) {
                         hint.style.opacity = '1';
                     }
-                });
-                elem.addEventListener('touchend', e => {
+                };
+                const handleTouchEnd = () => {
                     hint.style.opacity = '0';
 
                     if (map.behaviors.indexOf('drag') !== -1) {
                         map.setBehaviors(map.behaviors.filter(value => value !== 'drag'));
                     }
-                });
+                };
+
+                elem.addEventListener('touchstart', handleTouchStart);
+                elem.addEventListener('touchmove', handleTouchMove);
+                elem.addEventListener('touchend', handleTouchEnd);
             }
 
             addMapControl('show_zoom_controls', () => new ymaps3.YMapZoomControl());
@@ -442,17 +456,36 @@ document.addEventListener('DOMContentLoaded', () => {
             if (utilsModule.isMobileDevice()) {
                 applyMobileDrag(elem, map, activeMarkers);
             }
+
+            return () => {
+                while (cleanupCallbacks.length > 0) {
+                    const callback = cleanupCallbacks.pop();
+                    if (typeof callback !== 'function') {
+                        continue;
+                    }
+                    callback?.();
+                }
+            };
         }
 
         w.component("Yandexmap", {
             connected() {
+                this.cleanupFunction?.();
+                this.cleanupFunction = null;
+
                 if (this.script || (this.script = a.$("script", this.$el)),
                     !this.script
                 ) {
                     return;
                 }
                 const yandexmapProps = JSON.parse(this.script.textContent);
-                build(this.$el, yandexmapProps);
+                build(this.$el, yandexmapProps).then(cleanupFunction => {
+                    this.cleanupFunction = cleanupFunction;
+                });
+            },
+            disconnected() {
+                this.cleanupFunction?.();
+                this.cleanupFunction = null;
             }
         })
     })(UIkit, UIkit.util);
