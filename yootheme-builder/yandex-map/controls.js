@@ -20,14 +20,23 @@ export function createFullscreenControl(elementTag, ymaps3, map) {
         </svg>
     `;
 
+    const fullscreenTarget = map.container.parentNode;
+
+    const syncFullscreenState = () => {
+        fullScreenBtn.classList.toggle(
+            'ymaps-control-active',
+            document.fullscreenElement === fullscreenTarget
+        );
+    };
+
+    document.addEventListener('fullscreenchange', syncFullscreenState);
+
     return new ymaps3.YMapControlButton({
         onClick: () => {
-            if (document.fullscreenElement) {
-                document.exitFullscreen();
-                fullScreenBtn.classList.remove('ymaps-control-active');
+            if (document.fullscreenElement === fullscreenTarget) {
+                document.exitFullscreen().catch(() => {});
             } else {
-                map.container.parentNode.requestFullscreen();
-                fullScreenBtn.classList.add('ymaps-control-active');
+                fullscreenTarget.requestFullscreen().catch(() => {});
             }
         },
         element: fullScreenBtn
